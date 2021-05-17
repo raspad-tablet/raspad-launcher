@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Raspad-launcher
+Comment=Raspad-launcher
+Exec=/usr/local/bin/raspad-launcher-helper
+Type=Application
+Icon=/usr/share/icons/raspad.png
+Categories=Panel;MB
+X-MB-INPUT-MECHANSIM=True

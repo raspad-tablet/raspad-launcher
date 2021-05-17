@@ -1,0 +1,15 @@
+#!/bin/bash
+#export LD_LIBRARY_PATH=/opt/vc/lib/:$LD_LIBRARY_PATH
+#export QMLSCENE_DEVICE="softwarecontext"
+#export QT_IM_MODULE="qtvirtualkeyboard"
+#export QT_PQA_PLATFORM="xcb"
+#export QT_XCB_GL_INTEGRATION="xcb_egl"
+
+# If raspad.conf is not exist, means it's first boot up, don't show raspad-launcher, incase of launcher shows over config
+
+PID=`pidof raspad-launcher`
+if [ ! -e $PID ]; then
+	kill PID
+else
+	raspad-launcher&
+fi

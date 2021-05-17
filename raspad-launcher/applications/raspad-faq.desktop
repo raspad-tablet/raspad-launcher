@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=FAQ
+Name[zh_CN]=帮助
+Comment=FAQ for RasPad
+Exec=chromium-browser https://raspad.readthedocs.io/en/latest/
+Type=Application
+Icon=/usr/share/icons/raspad.png
+Categories=Help;MB
+X-MB-INPUT-MECHANSIM=True

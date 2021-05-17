@@ -1,0 +1,34 @@
+#!/bin/bash
+echo "Installing RasPad Launcher..."
+
+echo "Download qt runtime"
+wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
+uzip qt5pi.zip
+cp -r ./qt5pi /usr/local/qt5pi
+
+echo "Copy raspad launcher"
+cp ./applications/raspad-faq.desktop /usr/share/applications/
+cp ./applications/raspad-launcher.desktop /usr/share/applications/
+
+cp ./icons/raspad.png /usr/share/icons/
+
+cp ./bin/raspad-launcher /usr/local/bin/
+cp ./bin/raspad-launcher-helper /usr/local/bin/
+
+chmod +x /usr/local/bin/raspad-launcher
+chmod +x /usr/local/bin/raspad-launcher-helper
+
+# echo "Do you want to install matchbox-keyboard as touchscreen keyboard? (y/n)"
+# read input
+# if [ $input == "y" ]; then
+#     apt install matchbox-keyboard
+# fi
+
+echo "Install matchbox-keyboard"
+apt install matchbox-keyboard
+
+echo "Install screen auto rotator"
+git clone --depth=1 https://github.com/sunfounder/python-sh3001
+cd python-sh3001
+python3 install.py
+cd ..

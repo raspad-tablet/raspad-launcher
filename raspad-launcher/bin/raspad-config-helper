@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [ ! -f "/home/pi/.config/raspad/raspad.conf" ]; then
+    /usr/local/bin/raspad-config
+fi
