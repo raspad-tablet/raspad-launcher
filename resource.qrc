@@ -1,0 +1,45 @@
+<RCC>
+  <qresource prefix="/">
+    <file>./process.h</file>
+    <file>./raspad.pro</file>
+    <file>./raspad.pro.user</file>
+    <file>./resource.qrc</file>
+    <file>./readme.md</file>
+    <file>./main.cpp</file>
+    <file>./language.h</file>
+    <file>./raspad.pro.user.949a530</file>
+    <file>./language.cpp</file>
+    <file>./qrcgen.py</file>
+    <file>./images/Internet.png</file>
+    <file>./images/Run.png</file>
+    <file>./images/center.png</file>
+    <file>./images/Education.png</file>
+    <file>./images/SoundNVideo.png</file>
+    <file>./images/triangle.png</file>
+    <file>./images/Office.png</file>
+    <file>./images/Graphics.png</file>
+    <file>./images/Games.png</file>
+    <file>./images/Home.png</file>
+    <file>./images/Programming.png</file>
+    <file>./images/back.png</file>
+    <file>./images/loading.gif</file>
+    <file>./images/logo.png</file>
+    <file>./images/Help.png</file>
+    <file>./images/Accessories.png</file>
+    <file>./images/Preferences.png</file>
+    <file>./images/shutdown.png</file>
+    <file>./src/run.qml</file>
+    <file>./src/main.qml</file>
+    <file>./.vscode/sftp.json</file>
+    <file>./bin/install</file>
+    <file>./bin/raspad-faq.desktop</file>
+    <file>./bin/applications/raspad-launcher.desktop</file>
+    <file>./bin/applications/raspad-faq.desktop</file>
+    <file>./translations/zh_CN.qm</file>
+    <file>./translations/en_US.ts</file>
+    <file>./translations/en_US.qm</file>
+    <file>./translations/base.ts</file>
+    <file>./translations/base.qm</file>
+    <file>./translations/zh_CN.ts</file>
+  </qresource>
+</RCC>
