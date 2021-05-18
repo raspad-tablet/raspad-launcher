@@ -673,7 +673,38 @@ ApplicationWindow {
         }
     }
     function getIconPath(icon) {
-        var testList = ["/usr/share/icons/RasPad/256x256/apps/", "/usr/share/icons/RasPad/128x128/apps/", "/usr/share/icons/RasPad/64x64/apps/", "/usr/share/icons/RasPad/48x48/apps/", "/usr/share/icons/RasPad/256x256/devices/", "/usr/share/icons/RasPad/128x128/devices/", "/usr/share/icons/RasPad/64x64/devices/", "/usr/share/icons/RasPad/48x48/devices/", "/usr/share/icons/RasPad/256x256/places/", "/usr/share/icons/RasPad/128x128/places/", "/usr/share/icons/RasPad/64x64/places/", "/usr/share/icons/RasPad/48x48/places/", "/usr/share/icons/RasPad/256x256/categories/", "/usr/share/icons/RasPad/128x128/categories/", "/usr/share/icons/RasPad/64x64/categories/", "/usr/share/icons/RasPad/48x48/categories/", "/usr/share/icons/hicolor/256x256/apps/", "/usr/share/icons/hicolor/128x128/apps/", "/usr/share/icons/hicolor/64x64/apps/", "/usr/share/icons/hicolor/48x48/apps/", "/usr/share/icons/hicolor/32x32/apps/", "/usr/share/icons/gnome/256x256/apps/", "/usr/share/icons/gnome/128x128/apps/", "/usr/share/icons/gnome/64x64/apps/", "/usr/share/icons/gnome/48x48/apps/", "/usr/share/icons/gnome/256x256/devices/", "/usr/share/icons/gnome/128x128/devices/", "/usr/share/icons/gnome/64x64/devices/", "/usr/share/icons/gnome/48x48/devices/", "/usr/share/pixmaps/"]
+        var testList = [
+            "/usr/share/icons/PiXflat/256x256/apps/",
+            "/usr/share/icons/PiXflat/128x128/apps/",
+            "/usr/share/icons/PiXflat/64x64/apps/",
+            "/usr/share/icons/PiXflat/48x48/apps/",
+            "/usr/share/icons/PiXflat/256x256/devices/",
+            "/usr/share/icons/PiXflat/128x128/devices/",
+            "/usr/share/icons/PiXflat/64x64/devices/",
+            "/usr/share/icons/PiXflat/48x48/devices/",
+            "/usr/share/icons/PiXflat/256x256/places/",
+            "/usr/share/icons/PiXflat/128x128/places/",
+            "/usr/share/icons/PiXflat/64x64/places/",
+            "/usr/share/icons/PiXflat/48x48/places/",
+            "/usr/share/icons/PiXflat/256x256/categories/",
+            "/usr/share/icons/PiXflat/128x128/categories/",
+            "/usr/share/icons/PiXflat/64x64/categories/",
+            "/usr/share/icons/PiXflat/48x48/categories/",
+            "/usr/share/icons/hicolor/256x256/apps/",
+            "/usr/share/icons/hicolor/128x128/apps/",
+            "/usr/share/icons/hicolor/64x64/apps/",
+            "/usr/share/icons/hicolor/48x48/apps/",
+            "/usr/share/icons/hicolor/32x32/apps/",
+            "/usr/share/icons/gnome/256x256/apps/",
+            "/usr/share/icons/gnome/128x128/apps/",
+            "/usr/share/icons/gnome/64x64/apps/",
+            "/usr/share/icons/gnome/48x48/apps/",
+            "/usr/share/icons/gnome/256x256/devices/",
+            "/usr/share/icons/gnome/128x128/devices/",
+            "/usr/share/icons/gnome/64x64/devices/",
+            "/usr/share/icons/gnome/48x48/devices/",
+            "/usr/share/pixmaps/"
+        ];
         for (var i = 0; i < testList.length; i++) {
             var path = "file://" + testList[i] + icon + ".png"
             if (isFileExist(path)) {
