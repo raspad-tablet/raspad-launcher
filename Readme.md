@@ -29,7 +29,7 @@ RasPad OS intergrated with RasPad Launcher, RasPad FAQ with our custom UI and bo
 Download RasPad Launcher package, and extract it.
 
 ```bash
-wget https://github.com/raspad-tablet/raspad-launcher/releases/download/v1.1/raspad-launcher.zip
+wget https://github.com/raspad-tablet/raspad-launcher/releases/download/v1.2/raspad-launcher.zip
 unzip raspad-launcher.zip
 cd raspad-launcher
 ```
