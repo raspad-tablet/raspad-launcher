@@ -1,0 +1,34 @@
+<RCC>
+  <qresource prefix="/">
+    <file>raspad-launcher/qml/main.qml</file>
+    <file>raspad-launcher/qml/run.qml</file>
+    <file>raspad-launcher/images/Internet.png</file>
+    <file>raspad-launcher/images/Games.png</file>
+    <file>raspad-launcher/images/Graphics.png</file>
+    <file>raspad-launcher/images/SoundNVideo.png</file>
+    <file>raspad-launcher/images/Home.png</file>
+    <file>raspad-launcher/images/loading.gif</file>
+    <file>raspad-launcher/images/triangle.png</file>
+    <file>raspad-launcher/images/Run.png</file>
+    <file>raspad-launcher/images/shutdown.png</file>
+    <file>raspad-launcher/images/Help.png</file>
+    <file>raspad-launcher/images/Office.png</file>
+    <file>raspad-launcher/images/logo.png</file>
+    <file>raspad-launcher/images/center.png</file>
+    <file>raspad-launcher/images/Education.png</file>
+    <file>raspad-launcher/images/Accessories.png</file>
+    <file>raspad-launcher/images/Programming.png</file>
+    <file>raspad-launcher/images/Preferences.png</file>
+    <file>raspad-launcher/images/back.png</file>
+    <file>raspad-launcher/translations/base.qm</file>
+    <file>raspad-launcher/translations/base.ts</file>
+    <file>raspad-launcher/translations/zh_CN.ts</file>
+    <file>raspad-launcher/translations/zh_CN.qm</file>
+    <file>raspad-launcher/translations/en_US.ts</file>
+    <file>raspad-launcher/translations/en_US.qm</file>
+    <file>raspad-launcher/src/language.h</file>
+    <file>raspad-launcher/src/language.cpp</file>
+    <file>raspad-launcher/src/process.h</file>
+    <file>raspad-launcher/src/main.cpp</file>
+  </qresource>
+</RCC>

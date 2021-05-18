@@ -1,0 +1,105 @@
+#!/bin/bash
+echo "Installing RasPad Launcher..."
+
+ERRORS=""
+
+install_qt () {
+echo "Download qt runtime"
+    if ! wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip ; then
+        return 1
+    fi
+    if ! unzip qt5pi.zip ; then
+        return 2
+    fi
+    if ! cp -r ./qt5pi /usr/local/qt5pi ; then
+        return 3
+    fi
+    return 0
+}
+
+install_raspad_launcher () {
+    echo "Copy raspad launcher"
+    if ! cp ./applications/raspad-faq.desktop /usr/share/applications/ ; then
+        return 1
+    fi
+    if ! cp ./applications/raspad-launcher.desktop /usr/share/applications/ ; then
+        return 2
+    fi
+    if ! cp ./icons/raspad.png /usr/share/icons/ ; then
+        return 3
+    fi
+    if ! cp ./bin/raspad-launcher /usr/local/bin/ ; then
+        return 4
+    fi
+    if ! cp ./bin/raspad-launcher-helper /usr/local/bin/ ; then
+        return 5
+    fi
+    if ! chmod +x /usr/local/bin/raspad-launcher ; then
+        return 6
+    fi
+    if ! chmod +x /usr/local/bin/raspad-launcher-helper ; then
+        return 7
+    fi
+
+    if [ ! -d "/home/pi/.config/lxpanel" ]; then
+        if ! mkdir /home/pi/.config/lxpanel ; then
+            return 8
+        fi
+        if ! mkdir /home/pi/.config/lxpanel/LXDE-pi ; then
+            return 9
+        fi
+        if ! mkdir /home/pi/.config/lxpanel/LXDE-pi/panels ; then
+            return 10
+        fi
+    else
+        if ! cp /home/pi/.config/lxpanel/LXDE-pi/panels/panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak ; then
+            return 11
+        fi
+    fi
+
+    if ! cp ./panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel ; then
+        return 12
+    fi
+    return 0
+}
+
+install_display_rotator () {
+    echo "Install display auto rotator"
+    if ! git clone --depth=1 https://github.com/sunfounder/python-sh3001 ; then
+        return 1
+    fi
+    if ! cd python-sh3001 ; then
+        return 2
+    fi
+    if ! python3 install.py ; then
+        return 3
+    fi
+    if ! cd .. ; then
+        return 4
+    fi
+    return 0
+}
+
+if ! install_qt ; then
+    ERRORS=ERRORS+"  Qt Runtime install failed\n"
+fi
+if ! install_raspad_launcher ; then
+    ERRORS=ERRORS+"  RasPad Launcher install failed\n"
+fi
+if !  ; then
+    ERRORS=ERRORS+"  Panel setup failed\n"
+fi
+echo "Install matchbox-keyboard"
+if ! install_display_rotator ; then
+    ERRORS=ERRORS+"  Matchbox keyboard install failed\n"
+fi
+if ! apt install matchbox-keyboard -y ; then
+    ERRORS=ERRORS+"  Matchbox keyboard install failed\n"
+fi
+
+if [ $ERRORS == "" ]; then
+    echo "Installation Failed:"
+    echo $ERRORS
+else
+    echo "Installation success! Rebooting.."
+    reboot

@@ -1,0 +1,104 @@
+#!/bin/bash
+echo "Uninstalling RasPad Launcher..."
+
+ERRORS=""
+
+uninstall_qt () {
+    echo "Remove qt runtime"
+    if ! rm -rf /usr/local/qt5pi ; then
+        return 1
+    fi
+    return 0
+}
+
+uninstall_raspad-launcher () {
+    echo "Remove raspad launcher"
+    if ! rm -rf /usr/share/applications/raspad-faq.desktop ; then
+        return 1
+    fi
+    if ! rm -rf /usr/share/applications/raspad-launcher.desktop ; then
+        return 2
+    fi
+
+    if ! rm -rf /usr/share/icons/raspad.png ; then
+        return 3
+    fi
+
+    if ! rm -rf /usr/local/bin/raspad-launcher ; then
+        return 4
+    fi
+    if ! rm -rf /usr/local/bin/raspad-launcher-helper ; then
+        return 5
+    fi
+
+    if test -f "/home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak"; then
+        if ! mv /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak /home/pi/.config/lxpanel/LXDE-pi/panels/panel ; then
+            return 6
+        fi
+    else
+        if ! rm -r /home/pi/.config/lxpanel/LXDE-pi/panels/panel ; then
+            return 7
+        fi
+    fi
+    return 0
+}
+
+uninstall_matchbox_keyboard () {
+    echo "Uninstall matchbox-keyboard"
+    if ! apt install matchbox-keyboard ; then
+        return 1
+    fi
+    return 0
+}
+
+uninstall_display_rotator () {
+    echo "Uninstall display auto rotator"
+    if ! pip3 uninstall sh3001 ; then
+        return 1
+    fi
+    if ! rm -rf /usr/bin/rotate-helper ; then
+        return 2
+    fi
+    if ! rm -rf /home/pi/.config/auto-rotator ; then
+        return 3
+    fi
+    return 0
+}
+
+remove_package () {
+    echo "Remove install package"
+    if ! cd .. ; then
+        return 1
+    fi
+    if ! rm -rf raspad-launcher.zip ; then
+        return 2
+    fi
+    if ! rm -rf raspad-launcher ; then
+        return 3
+    fi
+    return 0
+}
+
+if ! uninstall_qt ; then
+    ERRORS=ERRORS+"  Uninstall Qt failed\n"
+fi
+if ! uninstall_raspad-launcher ; then
+    ERRORS=ERRORS+"  Uninstall RasPad Launcher failed\n"
+fi
+if ! uninstall_matchbox_keyboard ; then
+    ERRORS=ERRORS+"  Uninstall Matchbox keyboard failed\n"
+fi
+if ! uninstall_display_rotator ; then
+    ERRORS=ERRORS+"  Uninstall display rotator failed\n"
+fi
+if ! remove_package ; then
+    ERRORS=ERRORS+"  Remove package failed\n"
+fi
+
+
+if [ $ERRORS == "" ]; then
+    echo "Uninstallation Failed:"
+    echo $ERRORS
+else
+    echo "Uninstallation success! Rebooting.."
+    reboot

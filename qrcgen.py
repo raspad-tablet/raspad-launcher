@@ -64,6 +64,6 @@ if __name__=="__main__":
     #~ parser.print_help()
     args = parser.parse_args()
     prefix = args.prefix
-    # resname = os.path.split(args.directory)[-1]
-    resname = "resource"
+    resname = os.path.split(args.directory)[-1]
+    # resname = "resource"
     scan(args.directory,args.exclude)
