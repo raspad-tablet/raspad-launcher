@@ -18,8 +18,18 @@ cp ./bin/raspad-launcher-helper /usr/local/bin/
 chmod +x /usr/local/bin/raspad-launcher
 chmod +x /usr/local/bin/raspad-launcher-helper
 
+if [ ! -d "/home/pi/.config/lxpanel" ]; then
+    mkdir /home/pi/.config/lxpanel
+    mkdir /home/pi/.config/lxpanel/LXDE-pi
+    mkdir /home/pi/.config/lxpanel/LXDE-pi/panels
+else
+    cp /home/pi/.config/lxpanel/LXDE-pi/panels/panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak
+fi
+
+cp ./panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel
+
 echo "Install matchbox-keyboard"
-apt install matchbox-keyboard
+apt install matchbox-keyboard -y
 
 echo "Install screen auto rotator"
 git clone --depth=1 https://github.com/sunfounder/python-sh3001

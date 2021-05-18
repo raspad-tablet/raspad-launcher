@@ -14,11 +14,11 @@ rm -rf /usr/share/icons/raspad.png
 rm -rf /usr/local/bin/raspad-launcher
 rm -rf /usr/local/bin/raspad-launcher-helper
 
-# echo "Do you want to uninstall matchbox-keyboard? (y/n)"
-# read input
-# if [ $input == "y" ]; then
-#     apt purge matchbox-keyboard
-# fi
+if test -f "/home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak"; then
+    mv /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak /home/pi/.config/lxpanel/LXDE-pi/panels/panel
+else
+    rm -r /home/pi/.config/lxpanel/LXDE-pi/panels/panel
+fi
 
 echo "Uninstall matchbox-keyboard"
 apt install matchbox-keyboard
