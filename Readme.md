@@ -4,9 +4,9 @@
   - [Introduction](#introduction)
     - [Why we abandon RasPad OS and launch RasPad Launcher](#why-we-abandon-raspad-os-and-launch-raspad-launcher)
   - [Installation Guide](#installation-guide)
+    - [Download Package](#download-package)
     - [Method 1: Quick install with a script](#method-1-quick-install-with-a-script)
     - [Method 2: Manually install](#method-2-manually-install)
-      - [Download RasPad Launcher package](#download-raspad-launcher-package)
       - [Install RasPad Launcher](#install-raspad-launcher)
       - [Other Options](#other-options)
         - [Matchbox keyboard](#matchbox-keyboard)
@@ -24,6 +24,16 @@ RasPad OS intergrated with RasPad Launcher, RasPad FAQ with our custom UI and bo
 
 ## Installation Guide
 
+### Download Package
+
+Download RasPad Launcher package, and extract it.
+
+```bash
+wget https://github.com/raspad-tablet/raspad-launcher/releases/download/v1.1/raspad-launcher.zip
+tar xzvf raspad-launcher.zip
+cd raspad-launcher
+```
+
 ### Method 1: Quick install with a script
 
 If you don't really know what's going on, and don't care about messing up your own settings, like a brand new Raspbian. Or you are lazy enought to manual install everything, you can use the quick install script. The script will install these things:
@@ -33,16 +43,9 @@ If you don't really know what's going on, and don't care about messing up your o
 - RasPad FAQ desktop profile (Just a quick icon to browser RasPad FAQ webpage)
 - display auto rotate for Accl SHIM
 
-Download RasPad Launcher package, and extract it.
-
-```bash
-tar xzvf raspad-launcher-v1.0.0.tar.gz
-```
-
 Run install script
 
 ```bash
-cd raspad-launcher
 chmod +x install
 sudo ./install
 ```
@@ -50,15 +53,6 @@ sudo ./install
 ### Method 2: Manually install
 
 With manually install, you can choose what you need to install, where you want it to be and more
-
-#### Download RasPad Launcher package
-
-Download RasPad Launcher package, and extract it.
-
-```bash
-tar xzvf raspad-launcher-v1.0.0.tar.gz
-cd raspad-launcher
-```
 
 #### Install RasPad Launcher
 
@@ -68,7 +62,7 @@ Copy the pre compiled Qt runtime. It MUST be in `/usr/local/qt5pi`, or else the 
 # wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
 wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip
 uzip qt5pi.zip
-sudo cp ./qt5pi /usr/local/qt5pi
+sudo cp -r ./qt5pi /usr/local/qt5pi
 ```
 
 > You don't need this if you are just upgrading.
@@ -84,7 +78,6 @@ sudo chmod +x /usr/local/bin/raspad-launcher-helper
 ```
 
 > raspad-launcher-helper is a simple script to make raspad launcher work like a normal menu.
-
 > raspad-faq is a simple desktop profile to open RasPad FAQ wabpage in Chromium browser.
 
 #### Other Options

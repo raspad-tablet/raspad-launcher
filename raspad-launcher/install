@@ -18,12 +18,6 @@ cp ./bin/raspad-launcher-helper /usr/local/bin/
 chmod +x /usr/local/bin/raspad-launcher
 chmod +x /usr/local/bin/raspad-launcher-helper
 
-# echo "Do you want to install matchbox-keyboard as touchscreen keyboard? (y/n)"
-# read input
-# if [ $input == "y" ]; then
-#     apt install matchbox-keyboard
-# fi
-
 echo "Install matchbox-keyboard"
 apt install matchbox-keyboard
 

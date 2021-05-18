@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Ezblock Studio
-Name[zh_CN]=思天编程
-Comment=Visual Programming App from SunFounder
-Exec=ezblock-studio --single-process -platform xcb
-Type=Application
-Icon=/usr/share/icons/ezblock/64.png
-Categories=Programming
