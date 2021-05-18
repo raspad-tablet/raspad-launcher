@@ -6,7 +6,6 @@
   - [Installation Guide](#installation-guide)
     - [Method 1: Quick install with a script](#method-1-quick-install-with-a-script)
     - [Method 2: Manually install](#method-2-manually-install)
-      - [Qt runtime](#qt-runtime)
       - [Download RasPad Launcher package](#download-raspad-launcher-package)
       - [Install RasPad Launcher](#install-raspad-launcher)
       - [Other Options](#other-options)
@@ -52,16 +51,6 @@ sudo ./install
 
 With manually install, you can choose what you need to install, where you want it to be and more
 
-#### Qt runtime
-
-You will need qt runtime for RasPad Launcher
-
-```bash
-wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
-uzip qt5pi.zip
-sudo cp qt5pi /usr/local/qt5pi
-```
-
 #### Download RasPad Launcher package
 
 Download RasPad Launcher package, and extract it.
@@ -76,7 +65,8 @@ cd raspad-launcher
 Copy the pre compiled Qt runtime. It MUST be in `/usr/local/qt5pi`, or else the bin won't be able to find it.
 
 ```bash
-wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
+# wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
+wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip
 uzip qt5pi.zip
 sudo cp ./qt5pi /usr/local/qt5pi
 ```
