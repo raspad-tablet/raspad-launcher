@@ -30,7 +30,7 @@ Download RasPad Launcher package, and extract it.
 
 ```bash
 wget https://github.com/raspad-tablet/raspad-launcher/releases/download/v1.1/raspad-launcher.zip
-tar xzvf raspad-launcher.zip
+unzip raspad-launcher.zip
 cd raspad-launcher
 ```
 
@@ -61,7 +61,7 @@ Copy the pre compiled Qt runtime. It MUST be in `/usr/local/qt5pi`, or else the 
 ```bash
 # wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
 wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip
-uzip qt5pi.zip
+unzip qt5pi.zip
 sudo cp -r ./qt5pi /usr/local/qt5pi
 ```
 

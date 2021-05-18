@@ -3,7 +3,7 @@ echo "Installing RasPad Launcher..."
 
 echo "Download qt runtime"
 wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip
-uzip qt5pi.zip
+unzip qt5pi.zip
 cp -r ./qt5pi /usr/local/qt5pi
 
 echo "Copy raspad launcher"
