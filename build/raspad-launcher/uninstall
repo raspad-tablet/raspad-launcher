@@ -45,8 +45,14 @@ uninstall_raspad-launcher () {
 
 uninstall_matchbox_keyboard () {
     echo "Uninstall matchbox-keyboard"
-    if ! apt install matchbox-keyboard ; then
+    if ! apt purge matchbox-keyboard ; then
         return 1
+    fi
+    if ! rm /usr/share/applications/matchbox-keyboard.desktop ; then
+        return 2
+    fi
+    if ! rm /usr/local/bin/keyboard-helper ; then
+        return 3
     fi
     return 0
 }

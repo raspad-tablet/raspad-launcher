@@ -63,6 +63,22 @@ install_raspad_launcher () {
     return 0
 }
 
+install_keyboard () {
+    if ! apt install matchbox-keyboard -y ; then
+        return 1
+    fi
+    if ! cp ./applications/matchbox-keyboard.desktop /usr/share/applications/ ; then
+        return 2
+    fi
+    if ! cp ./bin/keyboard-helper /usr/local/bin/ ; then
+        return 3
+    fi
+    if ! chmod +x /usr/local/bin/keyboard-helper ; then
+        return 4
+    fi
+    return 0
+}
+
 install_display_rotator () {
     echo "Install display auto rotator"
     if ! git clone --depth=1 https://github.com/sunfounder/python-sh3001 ; then
@@ -91,10 +107,10 @@ if !  ; then
 fi
 echo "Install matchbox-keyboard"
 if ! install_display_rotator ; then
-    ERRORS=ERRORS+"  Matchbox keyboard install failed\n"
+    ERRORS=ERRORS+"  Install display rotator failed\n"
 fi
-if ! apt install matchbox-keyboard -y ; then
-    ERRORS=ERRORS+"  Matchbox keyboard install failed\n"
+if ! install_keyboard ; then
+    ERRORS=ERRORS+"  Install Matchbox keyboard  failed\n"
 fi
 
 if [ $ERRORS == "" ]; then
