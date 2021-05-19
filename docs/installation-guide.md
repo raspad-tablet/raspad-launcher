@@ -80,6 +80,8 @@ Copy RasPad Launcher related files including binary file, desktop profile, icon,
 sudo cp ./applications/raspad-launcher.desktop /usr/share/applications/
 sudo cp ./applications/raspad-faq.desktop /usr/share/applications/
 sudo cp ./icons/raspad.png /usr/share/icons/
+sudo cp ./bin/raspad-launcher /usr/local/bin/
+sudo cp ./bin/raspad-launcher-helper /usr/local/bin/
 sudo chmod +x /usr/local/bin/raspad-launcher
 sudo chmod +x /usr/local/bin/raspad-launcher-helper
 ```
