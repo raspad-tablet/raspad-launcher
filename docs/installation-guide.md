@@ -157,17 +157,17 @@ sudo ./uninstall
 #### Delete Qt runtime
 
 ```bash
-rm -rf /usr/local/qt5pi
+sudo rm -rf /usr/local/qt5pi
 ```
 
 #### Remove raspad launcher
 
 ```bash
-rm -rf /usr/share/applications/raspad-faq.desktop
-rm -rf /usr/share/applications/raspad-launcher.desktop
-rm -rf /usr/share/icons/raspad.png
-rm -rf /usr/local/bin/raspad-launcher
-rm -rf /usr/local/bin/raspad-launcher-helper
+sudo rm -rf /usr/share/applications/raspad-faq.desktop
+sudo rm -rf /usr/share/applications/raspad-launcher.desktop
+sudo rm -rf /usr/share/icons/raspad.png
+sudo rm -rf /usr/local/bin/raspad-launcher
+sudo rm -rf /usr/local/bin/raspad-launcher-helper
 ```
 
 #### Change menu back
@@ -198,13 +198,13 @@ Click close and it's Done.
 #### Uninstall matchbox-keyboard
 
 ```bash
-apt install matchbox-keyboard
+sudo apt purge matchbox-keyboard
 ```
 
 #### Uninstall screen auto rotator
 
 ```bash
-pip3 uninstall sh3001
-rm -rf /usr/bin/rotate-helper
-rm -rf /home/pi/.config/auto-rotator
+sudo pip3 uninstall sh3001
+sudo rm -rf /usr/bin/rotate-helper
+sudo rm -rf /home/pi/.config/auto-rotator
 ```
