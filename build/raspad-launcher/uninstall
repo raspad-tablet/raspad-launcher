@@ -1,110 +1,238 @@
-#!/bin/bash
-echo "Uninstalling RasPad Launcher..."
+#!/usr/bin/env python3
+import os, sys
 
-ERRORS=""
+errors = []
 
-uninstall_qt () {
-    echo "Remove qt runtime"
-    if ! rm -rf /usr/local/qt5pi ; then
-        return 1
-    fi
-    return 0
-}
+avaiable_options = ['-h', '--help', '--no-dep']
 
-uninstall_raspad-launcher () {
-    echo "Remove raspad launcher"
-    if ! rm -rf /usr/share/applications/raspad-faq.desktop ; then
-        return 1
-    fi
-    if ! rm -rf /usr/share/applications/raspad-launcher.desktop ; then
-        return 2
-    fi
+usage = '''
+Usage:
+    sudo python3 install.py [option]
 
-    if ! rm -rf /usr/share/icons/raspad.png ; then
-        return 3
-    fi
+Options:
+               --no-dep    Do not download dependencies
+    -h         --help      Show this help text and exit
+'''
+def install():
+    options = []
+    if len(sys.argv) > 1:
+        options = sys.argv[1:]
+        for o in options:
+            if o not in avaiable_options:
+                print("Option {} is not found.".format(o))
+                print(usage)
+                quit()
+    if "-h" in options or "--help" in options:
+        print(usage)
+        quit()
+    print("RasPad Launcher uninstall process starts")
 
-    if ! rm -rf /usr/local/bin/raspad-launcher ; then
-        return 4
-    fi
-    if ! rm -rf /usr/local/bin/raspad-launcher-helper ; then
-        return 5
-    fi
+    print("Uninstall Qt runtime")
+    do(msg="Remove Qt Runtime",
+        cmd='run_command("rm -rf /usr/local/qt5pi")')
 
-    if test -f "/home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak"; then
-        if ! mv /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak /home/pi/.config/lxpanel/LXDE-pi/panels/panel ; then
-            return 6
-        fi
-    else
-        if ! rm -r /home/pi/.config/lxpanel/LXDE-pi/panels/panel ; then
-            return 7
-        fi
-    fi
-    return 0
-}
+    print("Uninstall RasPad Launcher")
+    do(msg="Remove raspad-faq.desktop",
+        cmd='run_command("rm -rf /usr/share/applications/raspad-faq.desktop")')
+    do(msg="Remove raspad-launcher.desktop",
+        cmd='run_command("rm -rf /usr/share/applications/raspad-launcher.desktop")')
+    do(msg="Remove icon",
+        cmd='run_command("rm -rf /usr/share/icons/raspad.png")')
+    do(msg="Remove raspad-launcher",
+        cmd='run_command("rm -rf /usr/local/bin/raspad-launcher")')
+    do(msg="Remove raspad-launcher-helper",
+        cmd='run_command("rm -rf /usr/local/bin/raspad-launcher-helper")')
 
-uninstall_matchbox_keyboard () {
-    echo "Uninstall matchbox-keyboard"
-    if ! apt purge matchbox-keyboard ; then
-        return 1
-    fi
-    if ! rm /usr/share/applications/matchbox-keyboard.desktop ; then
-        return 2
-    fi
-    if ! rm /usr/local/bin/keyboard-helper ; then
-        return 3
-    fi
-    return 0
-}
+    if not os.path.exists("/home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak"):
+        do(msg="Restore panel backup",
+            cmd='run_command("mv /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak /home/pi/.config/lxpanel/LXDE-pi/panels/panel")')
+    else:
+        do(msg="Remove panel settings",
+            cmd='run_command("rm -r /home/pi/.config/lxpanel/LXDE-pi/panels/panel")')
 
-uninstall_display_rotator () {
-    echo "Uninstall display auto rotator"
-    if ! pip3 uninstall sh3001 ; then
-        return 1
-    fi
-    if ! rm -rf /usr/bin/rotate-helper ; then
-        return 2
-    fi
-    if ! rm -rf /home/pi/.config/auto-rotator ; then
-        return 3
-    fi
-    return 0
-}
+    do(msg="Reflash panel",
+        cmd='run_command("lxpanelctl restart")')
 
-remove_package () {
-    echo "Remove install package"
-    if ! cd .. ; then
-        return 1
-    fi
-    if ! rm -rf raspad-launcher.zip ; then
-        return 2
-    fi
-    if ! rm -rf raspad-launcher ; then
-        return 3
-    fi
-    return 0
-}
+    print("Uninstall MatchBox Keyboard")
+    do(msg="Uninstall matchbox-keyboard",
+        cmd='run_command("apt purge matchbox-keyboard -y")')
+    do(msg="Remove matchbox-keyboard.desktop",
+        cmd='run_command("rm /usr/share/applications/matchbox-keyboard.desktop")')
+    do(msg="Remove keyboard-helper",
+        cmd='run_command("rm /usr/local/bin/keyboard-helper")')
 
-if ! uninstall_qt ; then
-    ERRORS=ERRORS+"  Uninstall Qt failed\n"
-fi
-if ! uninstall_raspad-launcher ; then
-    ERRORS=ERRORS+"  Uninstall RasPad Launcher failed\n"
-fi
-if ! uninstall_matchbox_keyboard ; then
-    ERRORS=ERRORS+"  Uninstall Matchbox keyboard failed\n"
-fi
-if ! uninstall_display_rotator ; then
-    ERRORS=ERRORS+"  Uninstall display rotator failed\n"
-fi
-if ! remove_package ; then
-    ERRORS=ERRORS+"  Remove package failed\n"
-fi
+    print("Uninstall screen auto rotator")
+    do(msg="Disable auto rotate",
+        cmd='run_command("auto-rotator uninstall")')
+    do(msg="Uninstall python-sh3001",
+        cmd='run_command("pip3 uninstall sh3001 -y")')
+    do(msg="Remove bin",
+        cmd='run_command("rm -rf /usr/bin/rotate-helper")')
+    do(msg="Remove configs",
+        cmd='run_command("rm -rf /home/pi/.config/auto-rotator")')
+    os.chdir("..")
 
 
-if [ $ERRORS == "" ]; then
-    echo "Uninstallation Failed:"
-    echo $ERRORS
-else
-    echo "Uninstallation success! Rebooting.."
-    reboot
+    if len(errors) == 0:
+        print("Finished")
+    else:
+        print("\n\nError happened in install process:")
+        for error in errors:
+            print(error)
+        print("Try to fix it yourself, or contact service@sunfounder.com with this message")
+        sys.exit(1)
+
+def cleanup():
+    pass
+
+class Modules(object):
+    ''' 
+        To setup /etc/modules
+    '''
+
+    def __init__(self, file="/etc/modules"):
+        self.file = file
+        with open(self.file, 'r') as f:
+            self.configs = f.read()
+        self.configs = self.configs.split('\n')
+
+    def remove(self, expected):
+        for config in self.configs:
+            if expected in config:
+                self.configs.remove(config)
+        return self.write_file()
+
+    def set(self, name):
+        have_excepted = False
+        for i in range(len(self.configs)):
+            config = self.configs[i]
+            if name in config:
+                have_excepted = True
+                tmp = name
+                self.configs[i] = tmp
+                break
+
+        if not have_excepted:
+            tmp = name
+            self.configs.append(tmp)
+        return self.write_file()
+
+    def write_file(self):
+        try:
+            config = '\n'.join(self.configs)
+            # print(config)
+            with open(self.file, 'w') as f:
+                f.write(config)
+            return 0, config
+        except Exception as e:
+            return -1, e
+
+class Config(object):
+    ''' 
+        To setup /boot/config.txt
+    '''
+
+    def __init__(self, file="/boot/config.txt"):
+        self.file = file
+        with open(self.file, 'r') as f:
+            self.configs = f.read()
+        self.configs = self.configs.split('\n')
+
+    def remove(self, expected):
+        for config in self.configs:
+            if expected in config:
+                self.configs.remove(config)
+        return self.write_file()
+
+    def set(self, name, value=None):
+        have_excepted = False
+        for i in range(len(self.configs)):
+            config = self.configs[i]
+            if name in config:
+                have_excepted = True
+                tmp = name
+                if value != None:
+                    tmp += '=' + value
+                self.configs[i] = tmp
+                break
+
+        if not have_excepted:
+            tmp = name
+            if value != None:
+                tmp += '=' + value
+            self.configs.append(tmp)
+        return self.write_file()
+
+    def write_file(self):
+        try:
+            config = '\n'.join(self.configs)
+            # print(config)
+            with open(self.file, 'w') as f:
+                f.write(config)
+            return 0, config
+        except Exception as e:
+            return -1, e
+
+class Cmdline(object):
+    ''' 
+        To setup /boot/cmdline.txt
+    '''
+
+    def __init__(self, file="/boot/cmdline.txt"):
+        self.file = file
+        with open(self.file, 'r') as f:
+            cmdline = f.read()
+        self.cmdline = cmdline.strip()
+        self.cmds = self.cmdline.split(' ')
+
+    def remove(self, expected):
+        for cmd in self.cmds:
+            if expected in cmd:
+                self.cmds.remove(cmd)
+        return self.write_file()
+
+    def write_file(self):
+        try:
+            cmdline = ' '.join(self.cmds)
+            # print(cmdline)
+            with open(self.file, 'w') as f:
+                f.write(cmdline)
+            return 0, cmdline
+        except Exception as e:
+            return -1, e
+
+
+def run_command(cmd=""):
+    import subprocess
+    p = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    result = p.stdout.read().decode('utf-8')
+    status = p.poll()
+    # print(result)
+    # print(status)
+    return status, result
+
+
+def do(msg="", cmd=""):
+    print(" - %s..." % (msg), end='\r')
+    print(" - %s... " % (msg), end='')
+    status, result = eval(cmd)
+    # print(status, result)
+    if status == 0 or status == None or result == "":
+        print('Done')
+        return True
+    else:
+        print('Error')
+        errors.append("%s error:\n  Status:%s\n  Error:%s" %
+                      (msg, status, result))
+        return False
+
+if __name__ == "__main__":
+    try:
+        install()
+    except KeyboardInterrupt:
+        print("Canceled.")
+        cleanup()
+
+# if __name__ == "__main__":
+#     test()
