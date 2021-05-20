@@ -43,7 +43,7 @@ def install():
     do(msg="Remove raspad-launcher-helper",
         cmd='run_command("rm -rf /usr/local/bin/raspad-launcher-helper")')
 
-    if not os.path.exists("/home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak"):
+    if os.path.exists("/home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak"):
         do(msg="Restore panel backup",
             cmd='run_command("mv /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak /home/pi/.config/lxpanel/LXDE-pi/panels/panel")')
     else:
