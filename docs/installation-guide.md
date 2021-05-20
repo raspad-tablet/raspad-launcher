@@ -103,14 +103,14 @@ Then, click **Add** to add a new item
 On the popup window **Add plugin to panel**, choose **Application Launch Bar** and click **Add**
 ![add application launch bar](./images/add-application-launch-bar.jpg)
 
-The **Application Launch Bar** will be added on the bottom, click **Up** mutiple times to move it to the top
-![move application bar](./images/move-application-bar.jpg)
-
 Now click **Preferences** to add RasPad Launcher
 ![application bar preferences](./images/application-bar-preferences.jpg)
 
 In popup window, choose **Other** on the right, and choose **RasPad launcher**, click **Add**, RasPad Launcher will appear on the left. then click **Close** to close the window.
 ![add raspad launcher](./images/add-raspad-launcher.jpg)
+
+The **Application Launch Bar** will be added on the bottom, click **Up** mutiple times to move it to the top
+![move application bar](./images/move-application-bar.jpg)
 
 Now it's done, click Close, close the window. You can see the RasPad icon on the top left cornor
 ![done](./images/done.jpg)
