@@ -48,14 +48,14 @@ def install():
         cmd='run_command("cp ./bin/raspad-launcher-helper /usr/local/bin/")')
     do(msg="Add excute permission",
         cmd='run_command("chmod +x /usr/local/bin/raspad-launcher /usr/local/bin/raspad-launcher-helper")')
-    if not os.path.isdir("/home/pi/.config/lxpanel"):
-        do(msg="cp panel settings",
-            cmd='run_command("sudo cp /etc/xdg/lxpanel /home/pi/.config/")')
-        do(msg="change panel setting owner",
-            cmd='run_command("sudo chown -R pi:pi /home/pi/.config/lxpanel")')
-    else:
+    if os.path.isdir("/home/pi/.config/lxpanel/LXDE-pi/panels/panel"):
         do(msg="backup panel setting",
             cmd='run_command("cp /home/pi/.config/lxpanel/LXDE-pi/panels/panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak")')
+    else:
+        do(msg="cp panel settings",
+            cmd='run_command("sudo cp -r /etc/xdg/lxpanel /home/pi/.config/")')
+        do(msg="change panel setting owner",
+            cmd='run_command("sudo chown -R pi:pi /home/pi/.config/lxpanel")')
     do(msg="replace menu icon",
         cmd='run_command("cp ./panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel")')
     do(msg="Reflash panel",
@@ -94,7 +94,9 @@ def install():
         sys.exit(1)
 
 def cleanup():
-    pass
+    os.remove("qt5pi.zip")
+    os.remove("qt5pi")
+    os.remove("python-sh3001")
 
 class Modules(object):
     ''' 
@@ -240,7 +242,8 @@ def do(msg="", cmd=""):
 
 if __name__ == "__main__":
     try:
-        install()
+        if not install():
+            cleanup()
     except KeyboardInterrupt:
         print("Canceled.")
         cleanup()
