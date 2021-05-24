@@ -94,14 +94,14 @@ sudo chmod +x /usr/local/bin/raspad-launcher-helper
 Right click on the top panel, and choose **Add/Remove Panel Items**
 ![add remove panel items](./images/add-remove-panel-items.jpg)
 
-In Panel Preferences,Choose first item **Menu**, and click **Remove** on the right to remove the original menu
-![remove menu](./images/remove-menu.jpg)
-
 Then, click **Add** to add a new item
 ![add item](./images/add-item.jpg)
 
 On the popup window **Add plugin to panel**, choose **Application Launch Bar** and click **Add**
 ![add application launch bar](./images/add-application-launch-bar.jpg)
+
+The **Application Launch Bar** will be added on the bottom, click **Up** mutiple times to move it to the top
+![move application bar](./images/move-application-bar.jpg)
 
 Now click **Preferences** to add RasPad Launcher
 ![application bar preferences](./images/application-bar-preferences.jpg)
@@ -109,11 +109,13 @@ Now click **Preferences** to add RasPad Launcher
 In popup window, choose **Other** on the right, and choose **RasPad launcher**, click **Add**, RasPad Launcher will appear on the left. then click **Close** to close the window.
 ![add raspad launcher](./images/add-raspad-launcher.jpg)
 
-The **Application Launch Bar** will be added on the bottom, click **Up** mutiple times to move it to the top
-![move application bar](./images/move-application-bar.jpg)
+In Panel Preferences,Choose first item **Menu**, and click **Remove** on the right to remove the original menu
+![remove menu](./images/remove-menu.jpg)
 
 Now it's done, click Close, close the window. You can see the RasPad icon on the top left cornor
 ![done](./images/done.jpg)
+
+> Removing **menu** will cause some problem. like Application bar preferences will stuck for some reason. So you need to remove menu last.
 
 #### Other Options
 
