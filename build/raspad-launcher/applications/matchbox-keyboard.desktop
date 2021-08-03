@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Keyboard
-Comment=Virtual Keyboard
-Exec=keyboard-helper
-Type=Application
-Icon=keyboard
-Categories=Panel;Utility;MB
-X-MB-INPUT-MECHANSIM=True

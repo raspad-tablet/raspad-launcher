@@ -10,15 +10,12 @@
       - [Install RasPad Launcher](#install-raspad-launcher)
       - [Replace Menu with RasPad Launcher](#replace-menu-with-raspad-launcher)
       - [Other Options](#other-options)
-        - [Matchbox keyboard](#matchbox-keyboard)
         - [Display Auto rotator](#display-auto-rotator)
   - [Uninstallation Guide](#uninstallation-guide)
     - [Quick uninstall script](#quick-uninstall-script)
     - [Uninstall manually](#uninstall-manually)
-      - [Delete Qt runtime](#delete-qt-runtime)
       - [Remove raspad launcher](#remove-raspad-launcher)
       - [Change menu back](#change-menu-back)
-      - [Uninstall matchbox-keyboard](#uninstall-matchbox-keyboard)
       - [Uninstall screen auto rotator](#uninstall-screen-auto-rotator)
 
 ## Introduction
@@ -45,7 +42,7 @@ cd raspad-launcher
 
 If you don't really know what's going on, and don't care about messing up your own settings, like a brand new Raspbian. Or you are lazy enought to manual install everything, you can use the quick install script. The script will install these things:
 
-- Qt runtime
+- Qt dependencies
 - RasPad launcher with desktop profile
 - RasPad FAQ desktop profile (Just a quick icon to browser RasPad FAQ webpage)
 - display auto rotate for Accl SHIM
@@ -63,13 +60,11 @@ With manually install, you can choose what you need to install, where you want i
 
 #### Install RasPad Launcher
 
-Copy the pre compiled Qt runtime. It MUST be in `/usr/local/qt5pi`, or else the bin won't be able to find it.
+Install qt dependencies:
 
 ```bash
-# wget https://sunfounder.s3.us-east-1.amazonaws.com/others/qt5pi.zip
-wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip
-unzip qt5pi.zip
-sudo cp -r ./qt5pi /usr/local/qt5pi
+sudo apt update
+sudo apt install TODO
 ```
 
 > You don't need this if you are just upgrading.
@@ -121,14 +116,6 @@ Now it's done, click Close, close the window. You can see the RasPad icon on the
 
 Here's something you might want to install.
 
-##### Matchbox keyboard
-
-A simple keyboard for touchscreen, not great, but good enought to use.
-
-```bash
-sudo apt install matchbox-keyboard
-```
-
 ##### Display Auto rotator
 
 The display auto rotator for Accl SHIM
@@ -155,12 +142,6 @@ sudo ./uninstall
 ```
 
 ### Uninstall manually
-
-#### Delete Qt runtime
-
-```bash
-sudo rm -rf /usr/local/qt5pi
-```
 
 #### Remove raspad launcher
 
@@ -196,12 +177,6 @@ Under Icon, replace all content with "start-here", and click **OK**
 ![change icon](./images/change-icon.jpg)
 
 Click close and it's Done.
-
-#### Uninstall matchbox-keyboard
-
-```bash
-sudo apt purge matchbox-keyboard
-```
 
 #### Uninstall screen auto rotator
 

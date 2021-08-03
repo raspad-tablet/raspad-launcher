@@ -13,6 +13,21 @@ Options:
                --no-dep    Do not download dependencies
     -h         --help      Show this help text and exit
 '''
+
+DEPENDENCIES = [
+    "qml-module-qtquick-virtualkeyboard",
+    "qml-module-qt-labs-folderlistmodel",
+    "qtvirtualkeyboard-plugin",
+    "qml-module-qtquick-layouts",
+    "qml-module-qtquick-controls2",
+    "qml-module-qtquick-window2",
+    "qml-module-qtquick2",
+    "qml-module-qtgraphicaleffects",
+    "libqt5quickcontrols2-5",
+    "libqt5quicktemplates2-5",
+    "qml-module-qtquick-templates2",
+]
+
 def install():
     options = []
     if len(sys.argv) > 1:
@@ -27,13 +42,17 @@ def install():
         quit()
     print("RasPad Launcher install process starts")
 
-    print("Install Qt runtime")
-    do(msg="Download qt5pi",
-        cmd='run_command("wget https://github.com/raspad-tablet/qt5pi/releases/download/v1.0/qt5pi.zip")')
-    do(msg="Unzip",
-        cmd='run_command("unzip qt5pi.zip")')
-    do(msg="Copy",
-        cmd='run_command("cp -r ./qt5pi /usr/local/qt5pi")')
+    if "--no-dep" not in options:
+        do(msg="Update apt",
+            cmd='run_command("sudo apt update")')
+        dep = " ".join(DEPENDENCIES)
+        do(msg="Install dependencies",
+            cmd='run_command("sudo apt install %s -y")' % dep)
+
+    if os.path.isdir('/usr/local/qt5pi'):
+        print("Uninstall Old Qt runtime")
+        do(msg="Remove Qt Runtime",
+            cmd='run_command("rm -rf /usr/local/qt5pi")')
 
     print("Install RasPad Launcher")
     do(msg="Copy raspad-faq.desktop",
@@ -61,16 +80,6 @@ def install():
     do(msg="Reflash panel",
         cmd='run_command("lxpanelctl restart")')
 
-    print("Install MatchBox Keyboard")
-    do(msg="Install matchbox-keyboard",
-        cmd='run_command("sudo apt install matchbox-keyboard -y")')
-    do(msg="Copy matchbox-keyboard.desktop",
-        cmd='run_command("sudo cp ./applications/matchbox-keyboard.desktop /usr/share/applications/")')
-    do(msg="Copy keyboard-helper",
-        cmd='run_command("sudo cp ./bin/keyboard-helper /usr/local/bin/")')
-    do(msg="add excutable to helper",
-        cmd='run_command("sudo chmod +x /usr/local/bin/keyboard-helper")')
-
     print("Install screen auto rotator")
     do(msg="Clone package",
         cmd='run_command("git clone --depth=1 https://github.com/sunfounder/python-sh3001")')
@@ -80,7 +89,6 @@ def install():
     do(msg="Enable auto rotate",
         cmd='run_command("auto-rotator install")')
     os.chdir("..")
-
 
     if len(errors) == 0:
         print("Finished")
@@ -94,8 +102,6 @@ def install():
         sys.exit(1)
 
 def cleanup():
-    os.remove("qt5pi.zip")
-    os.remove("qt5pi")
     os.remove("python-sh3001")
 
 class Modules(object):
@@ -144,7 +150,6 @@ class Config(object):
     ''' 
         To setup /boot/config.txt
     '''
-
     def __init__(self, file="/boot/config.txt"):
         self.file = file
         with open(self.file, 'r') as f:
@@ -190,7 +195,6 @@ class Cmdline(object):
     ''' 
         To setup /boot/cmdline.txt
     '''
-
     def __init__(self, file="/boot/cmdline.txt"):
         self.file = file
         with open(self.file, 'r') as f:
@@ -225,22 +229,39 @@ def run_command(cmd=""):
     # print(status)
     return status, result
 
+def colored(text, color):
+    color = color.lower()
+    colors = {
+        "grey": "\033[1;30m%s\033[0m",
+        "red": "\033[1;31m%s\033[0m",
+        "green": "\033[1;32m%s\033[0m",
+        "yellow": "\033[1;33m%s\033[0m",
+        "blue": "\033[1;34m%s\033[0m",
+        "purple": "\033[1;35m%s\033[0m",
+        "cyan": "\033[1;36m%s\033[0m",
+        "white": "\033[1;37m%s\033[0m",
+    }
+    return colors[color] % text
 
 def do(msg="", cmd=""):
-    print(" - %s..." % (msg), end='\r')
-    print(" - %s... " % (msg), end='')
+    print("[    ] %s..." % (msg), end='', flush=True)
     status, result = eval(cmd)
     # print(status, result)
     if status == 0 or status == None or result == "":
-        print('Done')
+        print('\r[ %s ]' % colored("OK", "green"))
         return True
     else:
-        print('Error')
+        print('[%s]' % colored("Fail", "red"))
         errors.append("%s error:\n  Status:%s\n  Error:%s" %
                       (msg, status, result))
         return False
 
+def check_sudo():
+    if os.geteuid() != 0:
+        sys.exit("You need root permissions to do this!")
+
 if __name__ == "__main__":
+    check_sudo()
     try:
         if not install():
             cleanup()

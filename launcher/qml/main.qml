@@ -25,11 +25,11 @@ ApplicationWindow {
     property int iconHeight: 130
     property bool systemApplicationsFolderListDone: false
     property bool userApplicationsFolderListDone: false
-    property bool applicationsLoadsTriggerd: false
+    property bool isLoadApplicationTriggered: false
 
     property int lang
     property string langName: ""
-    property var appData: ""
+    property var appData: {}
     property var categoriedAppList: {
         "Home": ["Scratch 3", "Ezblock Studio", "Chromium Web Browser", "Minecraft Pi", "mu", "LibreOffice Writer", "LibreOffice Calc", "LibreOffice Impress", "File Manager PCManFM", "LXTerminal", "FAQ"],
         "Programming": [],
@@ -62,31 +62,16 @@ ApplicationWindow {
 
     property string errorNetwork: qsTr("Network Error")
 
+    // Set language after everythings done
     Component.onCompleted: {
         var l = Qt.locale().name.substring(0,2);
-        log(l);
+        // log(l);
         if (l == "zh") {
             lang = 1;
         } else {
             lang = 0;
         }
         language.setLanguage(lang);
-    }
-    Process {
-        id: process
-    }
-
-    Timer {
-        id: timer
-        interval: 100
-        running: false
-        onTriggered: {
-            killMyself.start("killall", ["raspad-launcher"])
-        }
-    }
-
-    Process {
-        id: killMyself
     }
 
     // Panel
@@ -103,13 +88,13 @@ ApplicationWindow {
         Image {
             id: logo
             source: "../images/logo.png"
-            width: 38
-            height: 38
+            width: 32
+            height: 32
             anchors {
                 top: parent.top
                 left: parent.left
-                topMargin: 7
-                leftMargin: 18
+                topMargin: 2
+                leftMargin: 3
                 bottomMargin: 41
             }
             MouseArea {
@@ -191,7 +176,7 @@ ApplicationWindow {
                 left: parent.left
                 bottom: powerRow.top
                 topMargin: 9
-                leftMargin: 18
+                leftMargin: 3
                 bottomMargin: 9
                 margins: 2
             }
@@ -199,11 +184,11 @@ ApplicationWindow {
             model: categoryList
             delegate: Button {
                 width: 242
-                height: 48
+                height: 40
                 Image {
                     id: circle
-                    width: 40
-                    height: 40
+                    width: 32
+                    height: 32
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     source: "../images/" + model.page + ".png"
@@ -217,10 +202,12 @@ ApplicationWindow {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 onClicked: {
+                    // log("Module on click");
                     currentCategory = model.page;
+                    // log("currentCategory: "+ currentCategory);
                     if (categoriedAppList[currentCategory] === undefined) {
                         loader.source = model.page.toLowerCase() + ".qml";
-                        language.setLanguage(lang);
+                        // language.setLanguage(lang);
                     } else {
                         reloadAppList(model.name);
                     }
@@ -260,6 +247,7 @@ ApplicationWindow {
         }
     }
 
+    // App Draw
     Rectangle {
         id: appDraw
         anchors {
@@ -357,8 +345,7 @@ ApplicationWindow {
                             if (appIcon.indexOf("/") === -1) {
                                 var _icon = getIconPath(appIcon)
                                 if (!_icon) {
-                                    log(
-                                        "cannot found icon: " + appIcon)
+                                    log("Load Icon: cannot found icon: " + appIcon)
                                     return ""
                                 }
                                 result = _icon
@@ -376,7 +363,7 @@ ApplicationWindow {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            log(JSON.stringify(categoriedAppList[currentCategory][appName]));
+                            // log("Icon on click" + JSON.stringify(categoriedAppList[currentCategory][appName]));
                             var arguments = appData[appName].appParam
                             process.setProgram(appExec)
                             process.setArguments(arguments)
@@ -389,7 +376,7 @@ ApplicationWindow {
                         interval: 500
                         running: false
                         onTriggered: {
-                            log("Kill myself")
+                            // log("killTimer: Kill myself")
                             processkill.start("killall", ["raspad-launcher"])
                         }
                     }
@@ -402,6 +389,7 @@ ApplicationWindow {
         }
     }
 
+    // To load qml page instead of app drawer
     Loader {
         id: loader
         anchors {
@@ -419,6 +407,7 @@ ApplicationWindow {
             // language.setLanguage(lang)
         }
     }
+    // 虚拟键盘
     InputPanel {
         id: inputPanel
         z: 89
@@ -461,64 +450,46 @@ ApplicationWindow {
             value: false
         }
         Component.onCompleted: {
-            log(
-                "activeLocales: " + VirtualKeyboardSettings.activeLocales)
-            log(
-                "availableLocales: " + VirtualKeyboardSettings.availableLocales)
+            // log("activeLocales: " + VirtualKeyboardSettings.activeLocales)
+            // log("availableLocales: " + VirtualKeyboardSettings.availableLocales)
             // log(Qt.locale().name.substring(0, 2))
         }
     }
+    // 系统安装APP的文件获取模型
     FolderListModel {
         id: systemApplicationsFolderList
         folder: "file:///usr/share/applications"
         nameFilters: ["*.desktop"]
         Component.onCompleted: {
-            applications_loads.start();
+            loadApplicationTimer.start();
         }
     }
+    // 用户安装APP的文件获取模型
     FolderListModel {
         id: userApplicationsFolderList
         folder: "file:///home/pi/.local/share/applications"
         nameFilters: ["*.desktop"]
         Component.onCompleted: {
-            applications_loads.start();
+            loadApplicationTimer.start();
         }
     }
-    Timer {
-        id: applications_loads
-        interval: 500
-        running: false
-        onTriggered: {
-            if (applicationsLoadsTriggerd) {
-                return;
-            }
-            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
-                applications_loads.start();
-                return;
-            }
-            if (userApplicationsFolderList.status !== FolderListModel.Ready) {
-                applications_loads.start();
-                return;
-            }
-            applicationsLoadsTriggerd = true;
-            appData = {};
-            loadFromFolderListModel(systemApplicationsFolderList);
-            loadFromFolderListModel(userApplicationsFolderList);
-            applicationsLoadsTriggerd = false;
-        }
-    }
-
 
     function loadFromFolderListModel(folderList) {
-        log("loadFromFolderListModel");
+        // log("loadFromFolderListModel(")
+        // logFolderList(folderList)
+        // log(")")
         var all_categories = [];
         var desktops = [];
         for (var i = 0; i < folderList.count; i++) {
             var url = folderList.get(i, "fileURL");
+            // if (! url.endsWith(".desktop")){
+            //     log("Ignore: " + url)
+            //     continue
+            // }
             var result = readFile(url, true);
 
             if (result === false) {
-                log("Read file Error: " + url);
+                // log("Read file Error: " + url);
                 continue;
             }
 
@@ -553,7 +524,6 @@ ApplicationWindow {
                 var temp = line.split("=");
                 var arg = temp[0];
                 var value = line.split(arg + "=")[1];
-                // printUrl(value, "Web Browser", url);
                 // log(langName);
                 if (arg === "Name") {
                     name = value;
@@ -622,7 +592,7 @@ ApplicationWindow {
             }
             if (whitelist.indexOf(name) !== -1) {
                 isWhiteListed = true;
-                log("White List: " + name);
+                // log("White List: " + name);
             }
             if (!isShow && !isWhiteListed) {
                 // log("Terminal App, Skip: " + url);
@@ -631,15 +601,19 @@ ApplicationWindow {
             var added = false;
             appData[name] = {
                 "appName": name,
-                "displayName": displayName,
-                "appCategories"// Todo: add display name translation
-                    : categories,
+                "displayName": displayName,// Todo: add display name translation
+                "appCategories": categories,
                 "appIcon": icon,
                 "appUrl": url,
                 "appExec": exec,
                 "appParam": param
             }
-            log(appData);
+            // log("appData[" + name + "]:")
+            // logObj(appData[name]);
+            // log("categories.length: " + categories.length);
+            // log("categories: ");
+            // logList(categories);
+
             for (var l = 0; l < categories.length; l++) {
                 for (category in categoryRule) {
                     if (categoryRule[category].indexOf(categories[l]) !== -1 && categoriedAppList[category].indexOf(name) === -1) {
@@ -647,12 +621,17 @@ ApplicationWindow {
                         added = true;
                         break;
                     }
+                    // log("categoriedAppList[" + category + "]");
+                    // logList(categoriedAppList[category]);
                 }
                 if (added) {
                     break;
                 }
             }
+            // logList(categoriedAppList)
         }
+        // log("categoriedAppList")
+        // logObj(categoriedAppList)
         reloadAppList();
     }
     function isFileExist(path) {
@@ -666,11 +645,6 @@ ApplicationWindow {
             return false
         }
         return true
-    }
-    function printUrl(value1value2url) {
-        if (value1 === value2) {
-            log(value2 + ": " + url)
-        }
     }
     function getIconPath(icon) {
         var testList = [
@@ -714,23 +688,28 @@ ApplicationWindow {
         return false
     }
     function reloadAppList(name) {
-        language.setLanguage(lang);
+        // log("reloadAppList(" + name + ")");
+        // language.setLanguage(lang);
         if (name !== undefined) {
-            appDrawLabelText.text = name
+            appDrawLabelText.text = name;
         }
-        appDrawList.clear()
+        appDrawList.clear();
+        // log("loader.visible: " + loader.visible)
         if (loader.visible) {
-            applications_loads.start()
-            loader.visible = false
-            loader.source = ""
-            appDraw.visible = true
+            loadApplicationTimer.start();
+            loader.visible = false;
+            loader.source = "";
+            appDraw.visible = true;
         } else {
-            var programs = categoriedAppList[currentCategory]
+            var programs = categoriedAppList[currentCategory];
+            // log("programs: " + programs);
+            // log("programs.length: " + programs.length);
             for (var i = 0; i < programs.length; i++) {
-                var appName = programs[i]
-                var app = appData[appName]
-                log(appData);
-                appDrawList.append(app)
+                var appName = programs[i];
+                var app = appData[appName];
+                // log("app:");
+                // logObj(app);
+                appDrawList.append(app);
             }
         }
     }
@@ -755,6 +734,30 @@ ApplicationWindow {
         }
     }
 
+    function logFolderList(li){
+        log("[")
+        for (var i=0; i<li.count; i++){
+            log("  " + li.get(i, "fileURL") + ",")
+        } 
+        log("]")
+    }
+    function logList(li){
+        log("[")
+        for (var i=0; i<li.length; i++){
+            log("  " + li[i] + ",")
+        } 
+        log("]")
+    }
+
+    function logObj(obj){
+        log("{")
+        for (var name in obj){
+            log("  " + name + " = " + obj[name] + ",")
+        } 
+        log("}")
+    }
+
+    // To Read file
     function readFile(file, raw) {
         var base = ""
         if (raw !== true) {
@@ -769,4 +772,47 @@ ApplicationWindow {
         var result = read.responseText
         return result
     }
+
+    // To load icons from folder list
+    Timer {
+        id: loadApplicationTimer
+        interval: 500
+        running: false
+        onTriggered: {
+            if (isLoadApplicationTriggered) {
+                return;
+            }
+            // if systemApplicationsFolderList is not Ready, Try again
+            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
+                loadApplicationTimer.start();
+                return;
+            }
+            // if userApplicationsFolderList is not Ready, Try again
+            if (userApplicationsFolderList.status !== FolderListModel.Ready) {
+                loadApplicationTimer.start();
+                return;
+            }
+            isLoadApplicationTriggered = true;
+            appData = {};
+            loadFromFolderListModel(systemApplicationsFolderList);
+            loadFromFolderListModel(userApplicationsFolderList);
+            isLoadApplicationTriggered = false;
+        }
+    }
+
+    // To kill itself after launcher an application
+    Timer {
+        id: timer
+        interval: 100
+        running: false
+        onTriggered: {
+            process.start("killall", ["raspad-launcher"])
+        }
+    }
+
+    // For running command
+    Process {
+        id: process
+    }
+
 }

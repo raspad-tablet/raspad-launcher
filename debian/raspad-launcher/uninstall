@@ -27,9 +27,9 @@ def install():
         quit()
     print("RasPad Launcher uninstall process starts")
 
-    print("Uninstall Qt runtime")
-    do(msg="Remove Qt Runtime",
-        cmd='run_command("rm -rf /usr/local/qt5pi")')
+    # print("Uninstall Qt runtime")
+    # do(msg="Remove Qt Runtime",
+    #     cmd='run_command("rm -rf /usr/local/qt5pi")')
 
     print("Uninstall RasPad Launcher")
     do(msg="Remove raspad-faq.desktop",
@@ -53,13 +53,13 @@ def install():
     do(msg="Reflash panel",
         cmd='run_command("lxpanelctl restart")')
 
-    print("Uninstall MatchBox Keyboard")
-    do(msg="Uninstall matchbox-keyboard",
-        cmd='run_command("apt purge matchbox-keyboard -y")')
-    do(msg="Remove matchbox-keyboard.desktop",
-        cmd='run_command("rm /usr/share/applications/matchbox-keyboard.desktop")')
-    do(msg="Remove keyboard-helper",
-        cmd='run_command("rm /usr/local/bin/keyboard-helper")')
+    # print("Uninstall MatchBox Keyboard")
+    # do(msg="Uninstall matchbox-keyboard",
+    #     cmd='run_command("apt purge matchbox-keyboard -y")')
+    # do(msg="Remove matchbox-keyboard.desktop",
+    #     cmd='run_command("rm /usr/share/applications/matchbox-keyboard.desktop")')
+    # do(msg="Remove keyboard-helper",
+    #     cmd='run_command("rm /usr/local/bin/keyboard-helper")')
 
     print("Uninstall screen auto rotator")
     do(msg="Disable auto rotate",

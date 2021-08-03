@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     qmlRegisterType<Process>("Process", 1, 0, "Process");
     
     engine.rootContext()->setContextProperty("language", &language);
-    engine.load(QUrl("qrc:///src/main.qml"));
+    engine.load(QUrl("qrc:///launcher/qml/main.qml"));
 
     return app.exec();
 }

@@ -1,9 +1,0 @@
-#!/bin/bash
-#This script toggle the virtual keyboard
-
-PID=`pidof matchbox-keyboard`
-if [ ! -e $PID ]; then
-	kill $PID
-else
-	matchbox-keyboard&
-fi
