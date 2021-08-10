@@ -4,6 +4,7 @@
   - [Introduction](#introduction)
     - [Why we abandon RasPad OS and launch RasPad Launcher](#why-we-abandon-raspad-os-and-launch-raspad-launcher)
   - [Installation Guide](#installation-guide)
+  - [Rebuild guide](#rebuild-guide)
 
 ## Introduction
 
@@ -18,3 +19,20 @@ RasPad OS intergrated with RasPad Launcher, RasPad FAQ with our custom UI and bo
 ## Installation Guide
 
 Checkout [Installation Guide](docs/installation-guide.md)
+
+## Rebuild guide
+
+Install build dependencies
+
+```bash
+sudo apt install -y qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools qttools5-dev qtdeclarative5-devqml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2
+```
+
+Make
+
+```bash
+qmake
+make
+```
+
+And there you go.

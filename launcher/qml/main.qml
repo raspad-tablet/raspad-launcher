@@ -3,8 +3,6 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import Process 1.0
 import QtQuick.Window 2.2
-import QtQuick.VirtualKeyboard 2.2
-import QtQuick.VirtualKeyboard.Settings 2.2
 import Qt.labs.folderlistmodel 2.0
 
 ApplicationWindow {
@@ -196,7 +194,7 @@ ApplicationWindow {
                 Text {
                     text: model.name
                     font.bold: true
-                    font.pointSize: 13
+                    font.pointSize: 12
                     anchors.left: circle.right
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
@@ -407,54 +405,7 @@ ApplicationWindow {
             // language.setLanguage(lang)
         }
     }
-    // 虚拟键盘
-    InputPanel {
-        id: inputPanel
-        z: 89
-        y: parent.height
-        anchors.left: parent.left
-        anchors.right: parent.right
-        //anchors.leftMargin: -62 -242
-        //anchors.bottom: parent.bottom
-        states: State {
-            name: "visible"
-            when: inputPanel.active
-            PropertyChanges {
-                target: inputPanel
-                //y: parent.height - inputPanel.height - 80
-                y: parent.height - inputPanel.height
-            }
-        }
-        transitions: Transition {
-            id: inputPanelTransition
-            from: ""
-            to: "visible"
-            reversible: true
-            enabled: !VirtualKeyboardSettings.fullScreenMode
-            ParallelAnimation {
-                NumberAnimation {
-                    properties: "y"
-                    duration: 250
-                    easing.type: Easing.InOutQuad
-                }
-            }
-        }
-        Binding {
-            target: InputContext
-            property: "animating"
-            value: inputPanelTransition.running
-        }
-        Binding {
-            target: VirtualKeyboardSettings
-            property: "fullScreenMode"
-            value: false
-        }
-        Component.onCompleted: {
-            // log("activeLocales: " + VirtualKeyboardSettings.activeLocales)
-            // log("availableLocales: " + VirtualKeyboardSettings.availableLocales)
-            // log(Qt.locale().name.substring(0, 2))
-        }
-    }
+
     // 系统安装APP的文件获取模型
     FolderListModel {
         id: systemApplicationsFolderList

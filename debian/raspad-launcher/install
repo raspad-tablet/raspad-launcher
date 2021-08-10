@@ -15,9 +15,7 @@ Options:
 '''
 
 DEPENDENCIES = [
-    "qml-module-qtquick-virtualkeyboard",
     "qml-module-qt-labs-folderlistmodel",
-    "qtvirtualkeyboard-plugin",
     "qml-module-qtquick-layouts",
     "qml-module-qtquick-controls2",
     "qml-module-qtquick-window2",
@@ -79,6 +77,13 @@ def install():
         cmd='run_command("cp ./panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel")')
     do(msg="Reflash panel",
         cmd='run_command("lxpanelctl restart")')
+
+    # print("Install Onboard Keyboard")
+    # do(msg="install onboard",
+    #     cmd='run_command("sudo apt install onboard at-spi2-core -y")')
+    # do(msg="install onboard",
+    #     cmd='run_command("sudo apt install onboard -y")')
+    # sudo apt install onboard
 
     print("Install screen auto rotator")
     do(msg="Clone package",

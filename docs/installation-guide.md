@@ -33,7 +33,7 @@ RasPad OS intergrated with RasPad Launcher, RasPad FAQ with our custom UI and bo
 Download RasPad Launcher package, and extract it.
 
 ```bash
-wget https://github.com/raspad-tablet/raspad-launcher/releases/download/v1.4/raspad-launcher.zip
+wget https://github.com/raspad-tablet/raspad-launcher/releases/download/v1.5/raspad-launcher.zip
 unzip raspad-launcher.zip
 cd raspad-launcher
 ```
@@ -64,7 +64,7 @@ Install qt dependencies:
 
 ```bash
 sudo apt update
-sudo apt install TODO
+sudo apt install qml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2
 ```
 
 > You don't need this if you are just upgrading.
