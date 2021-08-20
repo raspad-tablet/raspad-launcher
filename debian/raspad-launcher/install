@@ -10,8 +10,8 @@ Usage:
     sudo python3 install.py [option]
 
 Options:
-               --no-dep    Do not download dependencies
-    -h         --help      Show this help text and exit
+               --no-dep     Do not download dependencies
+    -h         --help       Show this help text and exit
 '''
 
 DEPENDENCIES = [
@@ -87,18 +87,21 @@ def install():
 
     print("Install screen auto rotator")
     do(msg="Clone package",
-        cmd='run_command("git clone --depth=1 https://github.com/sunfounder/python-sh3001")')
-    os.chdir("python-sh3001")
-    do(msg="Install python-sh3001",
-        cmd='run_command("python3 install.py")')
-    do(msg="Enable auto rotate",
-        cmd='run_command("auto-rotator install")')
+        cmd='run_command("git clone --depth=1 https://github.com/raspad-tablet/raspad-auto-rotator")')
+    os.chdir("raspad-auto-rotator")
+    do(msg="Install raspad-auto-rotator",
+        cmd='run_command("python3 install.py --no-reboot")')
     os.chdir("..")
 
     if len(errors) == 0:
         print("Finished")
-        do(msg="Reboot",
-            cmd='run_command("reboot")')
+        select = input("Installation needs to reboot. Do you want to reboot right now? (y/N): ")
+        if select.lower() == "y":
+            print("Reboot!")
+            time.sleep(1)
+            run_command("reboot")
+        else:
+            print("Canceled")
     else:
         print("\n\nError happened in install process:")
         for error in errors:
