@@ -259,7 +259,7 @@ def do(msg="", cmd=""):
         print('\r[ %s ]' % colored("OK", "green"))
         return True
     else:
-        print('[%s]' % colored("Fail", "red"))
+        print('\r[%s]' % colored("Fail", "red"))
         errors.append("%s error:\n  Status:%s\n  Error:%s" %
                       (msg, status, result))
         return False
