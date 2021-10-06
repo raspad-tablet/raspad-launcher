@@ -35,4 +35,12 @@ qmake
 make
 ```
 
+For raspbian bullseye, you need:
+
+```bash
+sudo apt -y install qtdeclarative5-dev qt5-qmake qtbase5-dev qtbase5-dev-tools qttools5-dev qml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2
+qmake -qt=qt5
+make
+```
+
 And there you go.
