@@ -21,8 +21,9 @@ ApplicationWindow {
     property int iconGridHeight: 200
     property int iconWidth: 130
     property int iconHeight: 130
-    property bool systemApplicationsFolderListDone: false
     property bool userApplicationsFolderListDone: false
+    property bool raspiUiOverridesApplicationsFolderListDone: false
+    property bool systemApplicationsFolderListDone: false
     property bool isLoadApplicationTriggered: false
 
     property int lang
@@ -424,6 +425,15 @@ ApplicationWindow {
             loadApplicationTimer.start();
         }
     }
+    // 用户安装APP的文件获取模型
+    FolderListModel {
+        id: raspiUiOverridesApplicationsFolderList
+        folder: "file:///usr/share/raspi-ui-overrides/applications"
+        nameFilters: ["*.desktop"]
+        Component.onCompleted: {
+            loadApplicationTimer.start();
+        }
+    }
 
     function loadFromFolderListModel(folderList) {
         // log("loadFromFolderListModel(")
@@ -742,20 +752,26 @@ ApplicationWindow {
             if (isLoadApplicationTriggered) {
                 return;
             }
-            // if systemApplicationsFolderList is not Ready, Try again
-            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
-            }
             // if userApplicationsFolderList is not Ready, Try again
             if (userApplicationsFolderList.status !== FolderListModel.Ready) {
                 loadApplicationTimer.start();
                 return;
             }
+            // if raspiUiOverridesApplicationsFolderList is not Ready, Try again
+            if (raspiUiOverridesApplicationsFolderList.status !== FolderListModel.Ready) {
+                loadApplicationTimer.start();
+                return;
+            }
+            // if systemApplicationsFolderList is not Ready, Try again
+            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
+                loadApplicationTimer.start();
+                return;
+            }
             isLoadApplicationTriggered = true;
             appData = {};
-            loadFromFolderListModel(systemApplicationsFolderList);
             loadFromFolderListModel(userApplicationsFolderList);
+            loadFromFolderListModel(raspiUiOverridesApplicationsFolderList);
+            loadFromFolderListModel(systemApplicationsFolderList);
             isLoadApplicationTriggered = false;
         }
     }
