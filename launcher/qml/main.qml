@@ -555,8 +555,8 @@ ApplicationWindow {
                 isWhiteListed = true;
                 // log("White List: " + name);
             }
-            if (!isShow && !isWhiteListed) {
-                // log("Terminal App, Skip: " + url);
+            if (appData[name]) {
+                // application name has been already seen.
                 continue;
             }
             var added = false;
@@ -567,7 +567,8 @@ ApplicationWindow {
                 "appIcon": icon,
                 "appUrl": url,
                 "appExec": exec,
-                "appParam": param
+                "appParam": param,
+                "appIsShow" : isShow || isWhiteListed
             }
             // log("appData[" + name + "]:")
             // logObj(appData[name]);
@@ -671,6 +672,9 @@ ApplicationWindow {
             loader.source = "";
             appDraw.visible = true;
         } else {
+            if (!appData) {
+                return;
+            }
             var programs = categoriedAppList[currentCategory];
             // log("programs: " + programs);
             // log("programs.length: " + programs.length);
@@ -679,7 +683,9 @@ ApplicationWindow {
                 var app = appData[appName];
                 // log("app:");
                 // logObj(app);
-                appDrawList.append(app);
+                if (app && app.appIsShow) {
+                    appDrawList.append(app);
+                }
             }
         }
     }
@@ -694,6 +700,7 @@ ApplicationWindow {
             log("Icon: " + app.appIcon);
             log("Exec: " + app.appExec);
             log("Param: " + app.appParam);
+            log("isShow: " + app.appIsShow);
         }
     }
 
