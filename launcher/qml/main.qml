@@ -30,7 +30,7 @@ ApplicationWindow {
     property string langName: ""
     property var appData: {}
     property var categoriedAppList: {
-        "Home": ["Scratch 3", "Ezblock Studio", "Chromium Web Browser", "Minecraft Pi", "mu", "LibreOffice Writer", "LibreOffice Calc", "LibreOffice Impress", "File Manager PCManFM", "LXTerminal", "FAQ"],
+        "Home": ["scratch3.desktop", "Ezblock Studio ???.desktop", "chromium-browser.desktop", "minecraft-pi.desktop", "mu.codewith.editor.desktop", "libreoffice-writer.desktop", "libreoffice-calc.desktop", "libreoffice-impress.desktop", "pcmanfm.desktop", "lxterminal.desktop", "raspad-faq.desktop"],
         "Programming": [],
         "Education": [],
         "Office": [],
@@ -55,8 +55,8 @@ ApplicationWindow {
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
-    property var blacklist: ["Squeak", "Wolfram"]
-    property var whitelist: ["Screen Configuration", "Bookshelf"]
+    property var blacklist: ["squeak.desktop", "wolfram-language.desktop"]
+    property var whitelist: ["arandr.desktop", "rp-bookshelf.desktop"]
     property var currentCategory: "Home"
 
     property string errorNetwork: qsTr("Network Error")
@@ -455,6 +455,7 @@ ApplicationWindow {
             }
 
             var contents = result.split("\n");
+            var fileID = "";
             var name = "";
             var localName = "";
             var genericName = "";
@@ -541,6 +542,8 @@ ApplicationWindow {
                 }
             }
             url = url.toString().slice(7);
+            var urllist = url.split("/")
+            fileID = urllist[urllist.length - 1];
             displayName = name;
             // if (genericName !== "" && genericName.length < 25){
             //     displayName = genericName;
@@ -548,20 +551,20 @@ ApplicationWindow {
             if (localName !== "") {
                 displayName = localName;
             }
-            if (blacklist.indexOf(name) !== -1) {
+            if (blacklist.indexOf(fileID) !== -1) {
                 isShow = false;
             }
-            if (whitelist.indexOf(name) !== -1) {
+            if (whitelist.indexOf(fileID) !== -1) {
                 isWhiteListed = true;
-                // log("White List: " + name);
+                // log("White List: " + fileID);
             }
-            if (appData[name]) {
-                // application name has been already seen.
+            if (appData[fileID]) {
+                // application fileID has been already seen.
                 continue;
             }
             var added = false;
-            appData[name] = {
-                "appName": name,
+            appData[fileID] = {
+                "appName": fileID,
                 "displayName": displayName,// Todo: add display name translation
                 "appCategories": categories,
                 "appIcon": icon,
@@ -570,16 +573,16 @@ ApplicationWindow {
                 "appParam": param,
                 "appIsShow" : isShow || isWhiteListed
             }
-            // log("appData[" + name + "]:")
-            // logObj(appData[name]);
+            // log("appData[" + fileID + "]:")
+            // logObj(appData[fileID]);
             // log("categories.length: " + categories.length);
             // log("categories: ");
             // logList(categories);
 
             for (var l = 0; l < categories.length; l++) {
                 for (category in categoryRule) {
-                    if (categoryRule[category].indexOf(categories[l]) !== -1 && categoriedAppList[category].indexOf(name) === -1) {
-                        categoriedAppList[category].push(name);
+                    if (categoryRule[category].indexOf(categories[l]) !== -1 && categoriedAppList[category].indexOf(fileID) === -1) {
+                        categoriedAppList[category].push(fileID);
                         added = true;
                         break;
                     }
