@@ -620,6 +620,7 @@ ApplicationWindow {
             "/usr/share/icons/hicolor/64x64/apps/",
             "/usr/share/icons/hicolor/48x48/apps/",
             "/usr/share/icons/hicolor/32x32/apps/",
+            "/usr/share/icons/hicolor/scalable/apps/",
             "/usr/share/icons/gnome/256x256/apps/",
             "/usr/share/icons/gnome/128x128/apps/",
             "/usr/share/icons/gnome/64x64/apps/",
@@ -631,7 +632,15 @@ ApplicationWindow {
             "/usr/share/pixmaps/"
         ];
         for (var i = 0; i < testList.length; i++) {
-            var path = "file://" + testList[i] + icon + ".png"
+            var path_pre = "file://" + testList[i] + icon
+            var path = path_pre
+            if (icon.indexOf(".png") == -1 && icon.indexOf(".svg") == -1) {
+                path = path_pre + ".png"
+                if (isFileExist(path)) {
+                    return path
+                }
+                path = path_pre + ".svg"
+            }
             if (isFileExist(path)) {
                 return path
             }
