@@ -51,7 +51,7 @@ ApplicationWindow {
         "SoundNVideo": ["AudioVideo", "Player", "Recorder", "Audio", "Video", "Midi", "X-Alsa", "X-Jack"],
         "Graphics": ["Graphics", "2DGraphics", "Photography"],
         "Games": ["Game"],
-        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "Qt", "PackageManager", "FileTools", "FileManager", "TextEditor"],
+        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "PackageManager", "FileTools", "FileManager", "TextEditor"],
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
