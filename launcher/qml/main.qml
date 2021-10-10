@@ -597,7 +597,6 @@ ApplicationWindow {
         }
         // log("categoriedAppList")
         // logObj(categoriedAppList)
-        reloadAppList();
     }
     function isFileExist(path) {
         var xhr = new XMLHttpRequest()
@@ -782,6 +781,7 @@ ApplicationWindow {
             loadFromFolderListModel(userApplicationsFolderList);
             loadFromFolderListModel(raspiUiOverridesApplicationsFolderList);
             loadFromFolderListModel(systemApplicationsFolderList);
+            reloadAppList();
             isLoadApplicationTriggered = false;
         }
     }
