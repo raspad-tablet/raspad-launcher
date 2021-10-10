@@ -447,6 +447,13 @@ ApplicationWindow {
             //     log("Ignore: " + url)
             //     continue
             // }
+            var filePath = url.toString().slice(7);
+            var urllist = filePath.split("/")
+            var fileID = urllist[urllist.length - 1];
+            if (appData[fileID]) {
+                // application fileID has been already seen.
+                continue;
+            }
             var result = readFile(url, true);
 
             if (result === false) {
@@ -455,7 +462,6 @@ ApplicationWindow {
             }
 
             var contents = result.split("\n");
-            var fileID = "";
             var name = "";
             var localName = "";
             var genericName = "";
@@ -541,9 +547,7 @@ ApplicationWindow {
                     }
                 }
             }
-            url = url.toString().slice(7);
-            var urllist = url.split("/")
-            fileID = urllist[urllist.length - 1];
+            url = filePath
             displayName = name;
             // if (genericName !== "" && genericName.length < 25){
             //     displayName = genericName;
@@ -557,10 +561,6 @@ ApplicationWindow {
             if (whitelist.indexOf(fileID) !== -1) {
                 isWhiteListed = true;
                 // log("White List: " + fileID);
-            }
-            if (appData[fileID]) {
-                // application fileID has been already seen.
-                continue;
             }
             var added = false;
             appData[fileID] = {
