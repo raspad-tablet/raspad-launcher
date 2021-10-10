@@ -384,7 +384,7 @@ ApplicationWindow {
                     }
                 }
             }
-            Component.onCompleted: reloadAppList(qsTr("Home"))
+            Component.onCompleted: reloadAppList(qsTr(currentCategory))
         }
     }
 
