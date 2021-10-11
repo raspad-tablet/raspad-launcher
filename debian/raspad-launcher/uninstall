@@ -61,18 +61,6 @@ def install():
     # do(msg="Remove keyboard-helper",
     #     cmd='run_command("rm /usr/local/bin/keyboard-helper")')
 
-    print("Uninstall screen auto rotator")
-    do(msg="Disable auto rotate",
-        cmd='run_command("auto-rotator uninstall")')
-    do(msg="Uninstall python-sh3001",
-        cmd='run_command("pip3 uninstall sh3001 -y")')
-    do(msg="Remove bin",
-        cmd='run_command("rm -rf /usr/bin/rotate-helper")')
-    do(msg="Remove configs",
-        cmd='run_command("rm -rf /home/pi/.config/auto-rotator")')
-    os.chdir("..")
-
-
     if len(errors) == 0:
         print("Finished")
     else:
