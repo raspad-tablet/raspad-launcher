@@ -33,7 +33,8 @@ DISTFILES += \
     launcher/images/shutdown.png \
     launcher/images/triangle.png \
     launcher/qml/main.qml\
-    launcher/qml/run.qml
+    launcher/qml/run.qml \
+    launcher/qml/execvalueparser.js
 
 SUBDIRS += \
     raspad-launcher.pro

@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.3
 import Process 1.0
 import QtQuick.Window 2.2
 import Qt.labs.folderlistmodel 2.0
+import QtQuick.Dialogs 1.1
+import "execvalueparser.js" as Parser
 
 ApplicationWindow {
     id: window
@@ -363,11 +365,27 @@ ApplicationWindow {
                         anchors.fill: parent
                         onClicked: {
                             // log("Icon on click" + JSON.stringify(categoriedAppList[currentCategory][appName]));
-                            var arguments = appData[appName].appParam
-                            process.setProgram(appExec)
-                            process.setArguments(arguments)
-                            process.startDetached()
-                            killTimer.start()
+                            var result = Parser.parseCommandLine(appData[appName])
+                            if (result.length === 0) {
+                                messageBox.text = "Desktop entry contains no valid Exec line!";
+                                messageBox.open();
+                                return;
+                            }
+                            var executable = result[0];
+                            var arguments = result.slice(1);
+                            process.setProgram(executable);
+                            process.setArguments(arguments);
+                            if (appPath) {
+                                process.setWorkingDirectory(appPath);
+                            } else {
+                                process.setWorkingDirectoryHome()
+                            }
+                            if (process.startDetached()) {
+                               killTimer.start()
+                            } else {
+                               messageBox.text = "Invalid desktop file: '" + appUrl + "'";
+                               messageBox.open();
+                            }
                         }
                     }
                     Timer {
@@ -405,6 +423,13 @@ ApplicationWindow {
             appDraw.visible = false
             // language.setLanguage(lang)
         }
+    }
+
+    MessageDialog {
+        id: messageBox
+        title: window.title
+        icon: StandardIcon.Critical
+        modality: Qt.ApplicationModal
     }
 
     // 系统安装APP的文件获取模型
@@ -468,7 +493,7 @@ ApplicationWindow {
             var displayName = "";
             var icon = "";
             var exec = "";
-            var param = [];
+            var path = "";
             var categories = [];
             var desktopType = "";
             var isShow = true;
@@ -516,22 +541,8 @@ ApplicationWindow {
                     icon = value;
                 } else if (arg === "Exec") {
                     exec = value;
-                    if (exec.indexOf(",") !== -1) {
-                        exec = exec.split(",");
-                        param = exec.slice(1);
-                        exec = exec[0];
-                    } else if (exec.indexOf(" ") !== -1) {
-                        exec = exec.split(" ");
-                        param = exec.slice(1);
-                        exec = exec[0];
-                    }
-                    var newParam = [];
-                    for (var paramI = 0; paramI < param.length; paramI++) {
-                        if (!param[paramI].startsWith("%")) {
-                            newParam.push(param[paramI]);
-                        }
-                    }
-                    param = newParam;
+                } else if (arg === "Path") {
+                    path = value;
                 } else if (arg === "Terminal") {
                     if (value === "true") {
                         isShow = false;
@@ -570,7 +581,7 @@ ApplicationWindow {
                 "appIcon": icon,
                 "appUrl": url,
                 "appExec": exec,
-                "appParam": param,
+                "appPath": path,
                 "appIsShow" : isShow || isWhiteListed
             }
             // log("appData[" + fileID + "]:")
@@ -699,7 +710,7 @@ ApplicationWindow {
             log("Categories: " + app.appCategories);
             log("Icon: " + app.appIcon);
             log("Exec: " + app.appExec);
-            log("Param: " + app.appParam);
+            log("Path: " + app.appPath);
             log("isShow: " + app.appIsShow);
         }
     }
