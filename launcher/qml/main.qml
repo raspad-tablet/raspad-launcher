@@ -53,7 +53,7 @@ ApplicationWindow {
         "SoundNVideo": ["AudioVideo", "Player", "Recorder", "Audio", "Video", "Midi", "X-Alsa", "X-Jack"],
         "Graphics": ["Graphics", "2DGraphics", "Photography"],
         "Games": ["Game"],
-        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "PackageManager", "FileTools", "FileManager", "TextEditor"],
+        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "PackageManager", "FileTools", "FileManager", "TextEditor", "None"],
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
@@ -501,7 +501,8 @@ ApplicationWindow {
             var icon = "";
             var exec = "";
             var path = "";
-            var categories = [];
+            // Use "uncategorized" category, in case no categories are given.
+            var categories = ["None"];
             var desktopType = "";
             var inTerminal = false;
             var isShow = true;
