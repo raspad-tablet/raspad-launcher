@@ -30,7 +30,6 @@ ApplicationWindow {
     property bool isLoadApplicationTriggered: false
 
     property int lang
-    property string langName: ""
     property var appData: {}
     property var categoriedAppList: {
         "Home": ["scratch3.desktop", "Ezblock Studio ???.desktop", "chromium-browser.desktop", "minecraft-pi.desktop", "mu.codewith.editor.desktop", "libreoffice-writer.desktop", "libreoffice-calc.desktop", "libreoffice-impress.desktop", "pcmanfm.desktop", "lxterminal.desktop", "raspad-faq.desktop"],
@@ -497,10 +496,8 @@ ApplicationWindow {
             }
 
             var contents = result.split("\n");
-            var name = "";
-            var localName = "";
-            var genericName = "";
-            var displayName = "";
+            var name = {};
+            var genericName = {};
             var icon = "";
             var exec = "";
             var path = "";
@@ -509,6 +506,8 @@ ApplicationWindow {
             var inTerminal = false;
             var isShow = true;
             var isWhiteListed = false;
+            var locale = Qt.locale().name;
+            var langName = locale.substring(0,2);
 
             for (var j = 0; j < contents.length; j++) {
                 var line = contents[j];
@@ -529,15 +528,33 @@ ApplicationWindow {
                 var arg = temp[0];
                 var value = line.split(arg + "=")[1];
                 // log(langName);
-                if (arg === "Name") {
-                    name = value;
-                } else if (arg === "Name[" + langName + "]") {
-                    localName = value;
-                } else if (arg === "GenericName[" + langName + "]") {
-                    localName = value;
-                } else if (arg === "GenericName") {
-                    genericName = value;
-                } else if (arg === "Categories") {
+                var match = arg.match(/^Name(\[([a-zA-Z0-9_@-]+)])?/);
+                if (match) {
+                    // Index 0 = whole matched string.
+                    // Index 2 = matched lang_COUNTRY string.
+                    if (match[2] === locale) {
+                        name["lang_COUNTRY"] = value;
+                    } else if (match[2] === langName) {
+                        name["lang"] = value;
+                    } else if (match[0] === "Name") {
+                        name["default"] = value;
+                    }
+                    continue;
+                }
+                match = arg.match(/^GenericName(\[([a-zA-Z0-9_@-]+)])?/);
+                if (match) {
+                    // Index 0 = whole matched string.
+                    // Index 2 = matched lang_COUNTRY string.
+                    if (match[2] === locale) {
+                        genericName["lang_COUNTRY"] = value;
+                    } else if (match[2] === langName) {
+                        genericName["lang"] = value;
+                    } else if (match[0] === "GenericName") {
+                        genericName["default"] = value;
+                    }
+                    continue;
+                }
+                if (arg === "Categories") {
                     categories = value.split(";");
                     for (var k = 0; k < categories.length; k++) {
                         var category = categories[k];
@@ -574,12 +591,24 @@ ApplicationWindow {
                 }
             }
             url = filePath
-            displayName = name;
-            // if (genericName !== "" && genericName.length < 25){
-            //     displayName = genericName;
-            // }
-            if (localName !== "") {
-                displayName = localName;
+            var displayName = "";
+            var keyOrder = ["lang_COUNTRY", "lang", "default"];
+            for (var k = 0; k < keyOrder.length; k++) {
+                if (name[keyOrder[k]]) {
+                    displayName = name[keyOrder[k]];
+                    break;
+                }
+            }
+            if (!displayName) {
+                for (var k = 0; k < keyOrder.length; k++) {
+                    if (genericName[keyOrder[k]]) {
+                        displayName = genericName[keyOrder[k]];
+                        break;
+                    }
+                }
+            }
+            if (!displayName) {
+                isShow = false;
             }
             if (blacklist.indexOf(fileID) !== -1) {
                 isShow = false;
@@ -591,7 +620,7 @@ ApplicationWindow {
             var added = false;
             appData[fileID] = {
                 "appName": fileID,
-                "displayName": displayName,// Todo: add display name translation
+                "displayName": displayName,
                 "appCategories": categories,
                 "appIcon": icon,
                 "appUrl": url,
