@@ -6,6 +6,7 @@ import QtQuick.Window 2.2
 import Qt.labs.folderlistmodel 2.0
 import QtQuick.Dialogs 1.1
 import "execvalueparser.js" as Parser
+import FileInfo 1.0
 
 ApplicationWindow {
     id: window
@@ -543,6 +544,10 @@ ApplicationWindow {
                     exec = value;
                 } else if (arg === "Path") {
                     path = value;
+                } else if (arg === "TryExec") {
+                    if (!fileinfo.exexcutableFileExists(value)) {
+                        isShow = false;
+                    }
                 } else if (arg === "Terminal") {
                     if (value === "true") {
                         isShow = false;
@@ -808,6 +813,10 @@ ApplicationWindow {
     // For running command
     Process {
         id: process
+    }
+    // For finding command
+    FileInfo {
+        id: fileinfo
     }
 
 }
