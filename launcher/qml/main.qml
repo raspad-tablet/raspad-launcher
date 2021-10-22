@@ -391,6 +391,11 @@ ApplicationWindow {
                             } else {
                                 process.setWorkingDirectoryHome()
                             }
+                            // Detach process from current stdin, stdout,
+                            // stderr, so that especially console programs
+                            // don't clutter the console of our launcher.
+                            process.setStandardFilesToNull();
+
                             if (process.startDetached()) {
                                killTimer.start()
                             } else {

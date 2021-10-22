@@ -66,4 +66,11 @@ public:
     Q_INVOKABLE QProcess::ProcessState state() {
         return QProcess::state();
     }
+
+    Q_INVOKABLE void setStandardFilesToNull() {
+        QString nullDev = nullDevice();
+        setStandardInputFile(nullDev);
+        setStandardOutputFile(nullDev);
+        setStandardErrorFile(nullDev);
+    }
 };
