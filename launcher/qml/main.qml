@@ -379,7 +379,7 @@ ApplicationWindow {
                                 return;
                             }
                             var executable = result[0];
-                            var arguments = result.slice(1);
+                            var args = result.slice(1);
                             if (!fileinfo.exexcutableFileExists(executable)) {
                                 messageBox.text = "Invalid desktop file: '" + appUrl + "'";
                                 messageBox.open();
@@ -387,11 +387,11 @@ ApplicationWindow {
                             }
                             if (appInTerminal) {
                                 executable = "lxterminal"
-                                arguments = result;
-                                arguments.unshift("-e");
+                                args = result;
+                                args.unshift("-e");
                             }
                             process.setProgram(executable);
-                            process.setArguments(arguments);
+                            process.setArguments(args);
                             if (appPath) {
                                 process.setWorkingDirectory(appPath);
                             } else {
