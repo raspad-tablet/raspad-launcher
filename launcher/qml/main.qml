@@ -237,8 +237,14 @@ ApplicationWindow {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        process.start("lxde-pi-shutdown-helper", [])
-                        timer.start()
+                        process.setProgram("lxde-pi-shutdown-helper");
+                        process.setArguments([]);
+                        process.setWorkingDirectoryHome()
+                        process.setStandardFilesToNull();
+
+                        if (process.startDetached()) {
+                            Qt.quit();
+                        }
                     }
                 }
                 Image {
@@ -397,24 +403,12 @@ ApplicationWindow {
                             process.setStandardFilesToNull();
 
                             if (process.startDetached()) {
-                               killTimer.start()
+                               Qt.quit();
                             } else {
                                messageBox.text = "Error starting command of desktop file: '" + appUrl + "'";
                                messageBox.open();
                             }
                         }
-                    }
-                    Timer {
-                        id: killTimer
-                        interval: 500
-                        running: false
-                        onTriggered: {
-                            // log("killTimer: Kill myself")
-                            processkill.start("killall", ["raspad-launcher"])
-                        }
-                    }
-                    Process {
-                        id: processkill
                     }
                 }
             }
@@ -815,16 +809,6 @@ ApplicationWindow {
             loadFromFolderListModel(systemApplicationsFolderList);
             reloadAppList();
             isLoadApplicationTriggered = false;
-        }
-    }
-
-    // To kill itself after launcher an application
-    Timer {
-        id: timer
-        interval: 100
-        running: false
-        onTriggered: {
-            process.start("killall", ["raspad-launcher"])
         }
     }
 
