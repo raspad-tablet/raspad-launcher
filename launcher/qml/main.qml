@@ -525,10 +525,13 @@ ApplicationWindow {
                 if (desktopType !== "[Desktop Entry]") {
                     continue;
                 }
-                var temp = line.split("=");
-                var arg = temp[0];
-                var value = line.split(arg + "=")[1];
-                // log(langName);
+                var equalPos = line.indexOf('=');
+                if (equalPos === -1) {
+                    continue;
+                }
+                var arg = line.slice(0, equalPos);
+                var value = line.slice(equalPos + 1);
+
                 var match = arg.match(/^Name(\[([a-zA-Z0-9_@-]+)])?/);
                 if (match) {
                     // Index 0 = whole matched string.
