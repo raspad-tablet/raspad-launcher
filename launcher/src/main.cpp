@@ -3,8 +3,8 @@
 #include <QtQml>
 #include <QFont>
 #include <QObject>
+#include <QTranslator>
 #include "process.h"
-#include "language.h"
 #include "fileinfo.h"
 
 int main(int argc, char **argv) {
@@ -19,13 +19,17 @@ int main(int argc, char **argv) {
     font.setFamily("Noto Sans CJK SC");
     app.setFont(font);
 
+    QTranslator translator;
+    if (translator.load(QLocale(), QLatin1String(""), QLatin1String(""),
+           QLatin1String(":/launcher/translations"))) {
+        QCoreApplication::installTranslator(&translator);
+    }
+
     QQmlApplicationEngine engine;
-    Language language(app, engine);
 
     qmlRegisterType<Process>("Process", 1, 0, "Process");
     qmlRegisterType<FileInfo>("FileInfo", 1, 0, "FileInfo");
 
-    engine.rootContext()->setContextProperty("language", &language);
     engine.load(QUrl("qrc:///launcher/qml/main.qml"));
 
     return app.exec();

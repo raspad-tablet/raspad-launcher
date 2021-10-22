@@ -3,8 +3,7 @@ TARGET = raspad-launcher
 QT += qml core quick network 
 
 SOURCES += \
-    launcher/src/main.cpp \
-    launcher/src/language.cpp
+    launcher/src/main.cpp
 
 RESOURCES += raspad-launcher.qrc
 
@@ -16,7 +15,6 @@ TRANSLATIONS += \
 
 HEADERS += \
     launcher/src/process.h \
-    launcher/src/language.h \
     launcher/src/fileinfo.h
 
 DISTFILES += \
