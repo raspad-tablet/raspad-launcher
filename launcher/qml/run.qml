@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
 import Process 1.0
+import "execvalueparser.js" as Parser
 //import QtQuick.VirtualKeyboard 2.2
 //import QtQuick.VirtualKeyboard.Settings 2.2
 
@@ -54,7 +55,37 @@ Rectangle {
         }
         MouseArea {
             anchors.fill: parent
-            onClicked: process.start(input.text, []);
+            onClicked: startCommand()
+        }
+    }
+
+    function startCommand() {
+        var result = Parser.doEscapingSecondLevelAndSplitArguments(input.text)
+        if (result.length === 0) {
+            messageBox.text = "Text is empty (or only consists of whitespace).";
+            messageBox.open();
+            return;
+        }
+        var executable = result[0];
+        var args = result.slice(1);
+        if (executable === '') {
+            messageBox.text = "Invalid command line!";
+            messageBox.open();
+            return;
+        }
+        process.setProgram(executable);
+        process.setArguments(args);
+        process.setWorkingDirectoryHome()
+        // Detach process from current stdin, stdout,
+        // stderr, so that especially console programs
+        // don't clutter the console of our launcher.
+        process.setStandardFilesToNull();
+
+        if (process.startDetached()) {
+            Qt.quit();
+        } else {
+           messageBox.text = "Error starting command!";
+           messageBox.open();
         }
     }
 /*
