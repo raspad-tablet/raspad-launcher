@@ -25,5 +25,7 @@
     <file>launcher/translations/zh.qm</file>
     <file>launcher/translations/en_US.qm</file>
     <file>launcher/translations/en.qm</file>
+    <file>launcher/translations/de_DE.qm</file>
+    <file>launcher/translations/de.qm</file>
   </qresource>
 </RCC>

@@ -11,6 +11,7 @@ CONFIG += localize_deployment
 TRANSLATIONS += \
     launcher/translations/en_US.ts \
     launcher/translations/zh_CN.ts \
+    launcher/translations/de_DE.ts \
     launcher/translations/base.ts
 
 HEADERS += \
