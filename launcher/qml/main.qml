@@ -7,6 +7,7 @@ import Qt.labs.folderlistmodel 2.0
 import QtQuick.Dialogs 1.1
 import "execvalueparser.js" as Parser
 import FileInfo 1.0
+import ProcessEnvironment 1.0
 
 ApplicationWindow {
     id: window
@@ -457,6 +458,8 @@ ApplicationWindow {
         // log("loadFromFolderListModel(")
         // logFolderList(folderList)
         // log(")")
+        var curDesktops = environment.getenv("XDG_CURRENT_DESKTOP").split(';');
+
         var all_categories = [];
         var desktops = [];
         for (var i = 0; i < folderList.count; i++) {
@@ -526,6 +529,26 @@ ApplicationWindow {
             var path = map["Path"] ? map["Path"] : '';
 
             var isShow = true;
+            var onlyShowIn = map["OnlyShowIn"];
+            if (onlyShowIn) {
+                isShow = false;
+                for (var k = 0; k < curDesktops.length; k++) {
+                    if (onlyShowIn.indexOf(curDesktops[k]) !== -1) {
+                        isShow = true;
+                        break;
+                    }
+                }
+            }
+            var notShowIn = map["NotShowIn"];
+            if (notShowIn) {
+                for (var k = 0; k < curDesktops.length; k++) {
+                    if (notShowIn.indexOf(curDesktops[k]) !== -1) {
+                        isShow = false;
+                        break;
+                    }
+                }
+            }
+
             if (map["TryExec"]) {
                 if (!fileinfo.exexcutableFileExists(map["TryExec"])) {
                     isShow = false;
@@ -534,11 +557,6 @@ ApplicationWindow {
             var inTerminal = map["Terminal"] === "true";
             if (map["NoDisplay"] === "true") {
                 isShow = false;
-            }
-            if (map["NotShowIn"]) {
-                if (value === "GNOME;KDE;XFCE;MATE;") {
-                    isShow = false;
-                }
             }
 
             var locale = Qt.locale().name;
@@ -799,6 +817,10 @@ ApplicationWindow {
     // For finding command
     FileInfo {
         id: fileinfo
+    }
+    // For accessing the environment
+    ProcessEnvironment {
+        id: environment
     }
 
 }
