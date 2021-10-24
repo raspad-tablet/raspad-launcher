@@ -64,7 +64,7 @@ ApplicationWindow {
     // Panel
     Rectangle {
         id: panel
-        width: 242
+        width: listView.width + 20
         height: parent.height
         anchors {
             top: parent.top
@@ -155,7 +155,7 @@ ApplicationWindow {
 
         ListView {
             id: listView
-            width: 222
+            width: 242
             clip: true
             interactive: false
             anchors {
