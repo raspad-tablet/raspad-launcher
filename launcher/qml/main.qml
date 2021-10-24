@@ -13,6 +13,8 @@ ApplicationWindow {
     id: window
     x: 0
     y: 0
+    width: Screen.width
+    height: Screen.height
     color: 'white'
     visible: true
     visibility: "FullScreen"
@@ -195,8 +197,11 @@ ApplicationWindow {
                     // log("currentCategory: "+ currentCategory);
                     if (categoriedAppList[currentCategory] === undefined) {
                         loader.source = model.page.toLowerCase() + ".qml";
+                        window.visibility = "Windowed"
+                        window.showMaximized()
                     } else {
                         reloadAppList(model.name);
+                        window.showFullScreen()
                     }
                 }
                 background: Rectangle {
