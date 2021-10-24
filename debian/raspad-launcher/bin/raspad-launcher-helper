@@ -8,8 +8,8 @@
 # If raspad.conf is not exist, means it's first boot up, don't show raspad-launcher, incase of launcher shows over config
 
 PID=`pidof raspad-launcher`
-if [ ! -e $PID ]; then
-	kill PID
+if [ -n "$PID" ]; then
+	kill $PID
 else
 	raspad-launcher&
 fi
