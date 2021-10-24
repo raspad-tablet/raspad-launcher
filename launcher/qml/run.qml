@@ -18,6 +18,7 @@ Rectangle {
         top: parent.top
         topMargin: 80
     }
+    Component.onCompleted: input.forceActiveFocus()
 
     Text {
         id: label
@@ -38,6 +39,15 @@ Rectangle {
         width: parent.width - 200
         height: 40
         font.pointSize: 15
+
+        Keys.onEnterPressed: {
+            startCommand()
+            event.accepted = true
+        }
+        Keys.onReturnPressed: {
+            startCommand()
+            event.accepted = true
+        }
     }
 
     Rectangle {
