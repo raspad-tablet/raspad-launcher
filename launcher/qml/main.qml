@@ -21,6 +21,12 @@ ApplicationWindow {
     flags: Qt.FramelessWindowHint
     title: 'RasPad Launcher'
 
+    onActiveChanged: {
+        if (!active) {
+            Qt.quit()
+        }
+    }
+
     property string settime
     property int iconGridWidth: 178
     property int iconGridHeight: 200
