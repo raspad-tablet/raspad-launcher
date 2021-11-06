@@ -511,6 +511,10 @@ ApplicationWindow {
                 map[arg] = value;
             }
 
+            if (map["Type"] !== "Application") {
+                continue;
+            }
+
             // Use "uncategorized" category, in case no categories are given.
             var categories = ["None"];
             if (map["Categories"]) {
