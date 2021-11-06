@@ -480,6 +480,7 @@ ApplicationWindow {
             }
 
             var contents = result.split("\n");
+            var map = {};
             var name = {};
             var genericName = {};
             var icon = "";
@@ -515,69 +516,57 @@ ApplicationWindow {
                 }
                 var arg = line.slice(0, equalPos);
                 var value = line.slice(equalPos + 1);
+                map[arg] = value;
+            }
 
-                var match = arg.match(/^Name(\[([a-zA-Z0-9_@-]+)])?/);
-                if (match) {
-                    // Index 0 = whole matched string.
-                    // Index 2 = matched lang_COUNTRY string.
-                    if (match[2] === locale) {
-                        name["lang_COUNTRY"] = value;
-                    } else if (match[2] === lang) {
-                        name["lang"] = value;
-                    } else if (match[0] === "Name") {
-                        name["default"] = value;
-                    }
-                    continue;
-                }
-                match = arg.match(/^GenericName(\[([a-zA-Z0-9_@-]+)])?/);
-                if (match) {
-                    // Index 0 = whole matched string.
-                    // Index 2 = matched lang_COUNTRY string.
-                    if (match[2] === locale) {
-                        genericName["lang_COUNTRY"] = value;
-                    } else if (match[2] === lang) {
-                        genericName["lang"] = value;
-                    } else if (match[0] === "GenericName") {
-                        genericName["default"] = value;
-                    }
-                    continue;
-                }
-                if (arg === "Categories") {
-                    categories = value.split(";");
-                    for (var k = 0; k < categories.length; k++) {
-                        var category = categories[k];
-                        if (category === "") {
-                            continue;
-                        }
+            name["lang_COUNTRY"] = map["Name[" + locale + "]"]
+            name["lang"] = map["Name[" + lang + "]"]
+            name["default"] = map["Name"]
+            genericName["lang_COUNTRY"] = map["GenericName[" + locale + "]"]
+            genericName["lang"] = map["GenericName[" + lang + "]"]
+            genericName["default"] = map["GenericName"]
+            if (map["Categories"]) {
+                categories = map["Categories"].split(";");
+                for (var k = 0; k < categories.length; k++) {
+                    var category = categories[k];
+                    if (category !== "") {
                         if (all_categories.indexOf(category) === -1) {
                             all_categories.push(category)
                         }
                     }
-                } else if (arg === "Icon") {
-                    icon = value;
-                } else if (arg === "Exec") {
-                    exec = value;
-                } else if (arg === "Path") {
-                    path = value;
-                } else if (arg === "TryExec") {
-                    if (!fileinfo.exexcutableFileExists(value)) {
-                        isShow = false;
-                    }
-                } else if (arg === "Terminal") {
-                    if (value === "true") {
-                        inTerminal = true;
-                    }
-                } else if (arg === "NoDisplay") {
-                    // log("NoDisplay true: " + url);
-                    if (value === "true") {
-                        isShow = false;
-                    }
-                } else if (arg === "NotShowIn") {
-                    if (value === "GNOME;KDE;XFCE;MATE;") {
-                        isShow = false;
-                    }
                 }
             }
+            if (map["Icon"]) {
+                icon = map["Icon"];
+            }
+            if (map["Exec"]) {
+                exec = map["Exec"];
+            }
+            if (map["Path"]) {
+                path = map["Path"];
+            }
+            if (map["TryExec"]) {
+                if (!fileinfo.exexcutableFileExists(map["TryExec"])) {
+                    isShow = false;
+                }
+            }
+            if (map["Terminal"]) {
+                if (map["Terminal"] === "true") {
+                    inTerminal = true;
+                }
+            }
+            if (map["NoDisplay"]) {
+                // log("NoDisplay true: " + url);
+                if (map["NoDisplay"] === "true") {
+                    isShow = false;
+                }
+            }
+            if (map["NotShowIn"]) {
+                if (value === "GNOME;KDE;XFCE;MATE;") {
+                    isShow = false;
+                }
+            }
+
             url = filePath
             var displayName = "";
             var keyOrder = ["lang_COUNTRY", "lang", "default"];
