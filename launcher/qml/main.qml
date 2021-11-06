@@ -669,25 +669,23 @@ ApplicationWindow {
         appDrawList.clear();
         // log("loader.visible: " + loader.visible)
         if (loader.visible) {
-            loadApplicationTimer.start();
             loader.visible = false;
             loader.source = "";
             appDraw.visible = true;
-        } else {
-            if (!appData) {
-                return;
-            }
-            var programs = categoriedAppList[currentCategory];
-            // log("programs: " + programs);
-            // log("programs.length: " + programs.length);
-            for (var i = 0; i < programs.length; i++) {
-                var appName = programs[i];
-                var app = appData[appName];
-                // log("app:");
-                // logObj(app);
-                if (app && app.appIsShow) {
-                    appDrawList.append(app);
-                }
+        }
+        if (!appData) {
+            return;
+        }
+        var programs = categoriedAppList[currentCategory];
+        // log("programs: " + programs);
+        // log("programs.length: " + programs.length);
+        for (var i = 0; i < programs.length; i++) {
+            var appName = programs[i];
+            var app = appData[appName];
+            // log("app:");
+            // logObj(app);
+            if (app && app.appIsShow) {
+                appDrawList.append(app);
             }
         }
     }
