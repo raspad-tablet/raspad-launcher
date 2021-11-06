@@ -478,22 +478,11 @@ ApplicationWindow {
                 // log("Read file Error: " + url);
                 continue;
             }
+            url = filePath;
 
             var contents = result.split("\n");
             var map = {};
-            var name = {};
-            var genericName = {};
-            var icon = "";
-            var exec = "";
-            var path = "";
-            // Use "uncategorized" category, in case no categories are given.
-            var categories = ["None"];
             var desktopType = "";
-            var inTerminal = false;
-            var isShow = true;
-            var isWhiteListed = false;
-            var locale = Qt.locale().name;
-            var lang = locale.substring(0,2);
 
             for (var j = 0; j < contents.length; j++) {
                 var line = contents[j];
@@ -519,12 +508,8 @@ ApplicationWindow {
                 map[arg] = value;
             }
 
-            name["lang_COUNTRY"] = map["Name[" + locale + "]"]
-            name["lang"] = map["Name[" + lang + "]"]
-            name["default"] = map["Name"]
-            genericName["lang_COUNTRY"] = map["GenericName[" + locale + "]"]
-            genericName["lang"] = map["GenericName[" + lang + "]"]
-            genericName["default"] = map["GenericName"]
+            // Use "uncategorized" category, in case no categories are given.
+            var categories = ["None"];
             if (map["Categories"]) {
                 categories = map["Categories"].split(";");
                 for (var k = 0; k < categories.length; k++) {
@@ -536,30 +521,19 @@ ApplicationWindow {
                     }
                 }
             }
-            if (map["Icon"]) {
-                icon = map["Icon"];
-            }
-            if (map["Exec"]) {
-                exec = map["Exec"];
-            }
-            if (map["Path"]) {
-                path = map["Path"];
-            }
+            var icon = map["Icon"] ? map["Icon"] : '';
+            var exec = map["Exec"] ? map["Exec"] : '';
+            var path = map["Path"] ? map["Path"] : '';
+
+            var isShow = true;
             if (map["TryExec"]) {
                 if (!fileinfo.exexcutableFileExists(map["TryExec"])) {
                     isShow = false;
                 }
             }
-            if (map["Terminal"]) {
-                if (map["Terminal"] === "true") {
-                    inTerminal = true;
-                }
-            }
-            if (map["NoDisplay"]) {
-                // log("NoDisplay true: " + url);
-                if (map["NoDisplay"] === "true") {
-                    isShow = false;
-                }
+            var inTerminal = map["Terminal"] === "true";
+            if (map["NoDisplay"] === "true") {
+                isShow = false;
             }
             if (map["NotShowIn"]) {
                 if (value === "GNOME;KDE;XFCE;MATE;") {
@@ -567,33 +541,34 @@ ApplicationWindow {
                 }
             }
 
-            url = filePath
-            var displayName = "";
-            var keyOrder = ["lang_COUNTRY", "lang", "default"];
-            for (var k = 0; k < keyOrder.length; k++) {
-                if (name[keyOrder[k]]) {
-                    displayName = name[keyOrder[k]];
-                    break;
-                }
+            var locale = Qt.locale().name;
+            var lang = locale.substring(0,2);
+
+            var displayName = map["Name[" + locale + "]"];
+            if (!displayName) {
+                displayName = map["Name[" + lang + "]"];
             }
             if (!displayName) {
-                for (var k = 0; k < keyOrder.length; k++) {
-                    if (genericName[keyOrder[k]]) {
-                        displayName = genericName[keyOrder[k]];
-                        break;
-                    }
-                }
+                displayName = map["Name"];
+            }
+            if (!displayName) {
+                displayName = map["GenericName[" + locale + "]"];
+            }
+            if (!displayName) {
+                displayName = map["GenericName[" + lang + "]"];
+            }
+            if (!displayName) {
+                displayName = map["GenericName"];
             }
             if (!displayName) {
                 isShow = false;
             }
+
             if (blacklist.indexOf(fileID) !== -1) {
                 isShow = false;
             }
-            if (whitelist.indexOf(fileID) !== -1) {
-                isWhiteListed = true;
-                // log("White List: " + fileID);
-            }
+            var isWhiteListed = whitelist.indexOf(fileID) !== -1;
+
             var added = false;
             appData[fileID] = {
                 "appName": fileID,
