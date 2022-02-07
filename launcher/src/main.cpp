@@ -5,6 +5,7 @@
 #include <QObject>
 #include "process.h"
 #include "language.h"
+#include "fileinfo.h"
 
 int main(int argc, char **argv) {
     qputenv("QMLSCENE_DEVICE", "softwarecontext");
@@ -22,7 +23,8 @@ int main(int argc, char **argv) {
     Language language(app, engine);
 
     qmlRegisterType<Process>("Process", 1, 0, "Process");
-    
+    qmlRegisterType<FileInfo>("FileInfo", 1, 0, "FileInfo");
+
     engine.rootContext()->setContextProperty("language", &language);
     engine.load(QUrl("qrc:///launcher/qml/main.qml"));
 

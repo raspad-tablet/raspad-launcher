@@ -1,5 +1,6 @@
 #include <QProcess>
 #include <QVariant>
+#include <QDir>
 
 class Process : public QProcess {
     Q_OBJECT
@@ -18,12 +19,20 @@ public:
         QProcess::start(program, args);
     }
 
-    Q_INVOKABLE void startDetached(qint64 *pid = nullptr) {
-        QProcess::startDetached(pid);
+    Q_INVOKABLE bool startDetached(qint64 *pid = nullptr) {
+        return QProcess::startDetached(pid);
     }
 
     Q_INVOKABLE void setProgram(const QString &program) {
         QProcess::setProgram(program);
+    }
+
+    Q_INVOKABLE void setWorkingDirectory(const QString &dir) {
+        QProcess::setWorkingDirectory(dir);
+    }
+
+    Q_INVOKABLE void setWorkingDirectoryHome() {
+        QProcess::setWorkingDirectory(QDir::homePath());
     }
 
     Q_INVOKABLE void setArguments(const QVariantList &arguments) {
@@ -56,5 +65,12 @@ public:
 
     Q_INVOKABLE QProcess::ProcessState state() {
         return QProcess::state();
+    }
+
+    Q_INVOKABLE void setStandardFilesToNull() {
+        QString nullDev = nullDevice();
+        setStandardInputFile(nullDev);
+        setStandardOutputFile(nullDev);
+        setStandardErrorFile(nullDev);
     }
 };

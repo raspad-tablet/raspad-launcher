@@ -16,7 +16,8 @@ TRANSLATIONS += \
 
 HEADERS += \
     launcher/src/process.h \
-    launcher/src/language.h
+    launcher/src/language.h \
+    launcher/src/fileinfo.h
 
 DISTFILES += \
     launcher/images/Accessories.png \
@@ -33,7 +34,8 @@ DISTFILES += \
     launcher/images/shutdown.png \
     launcher/images/triangle.png \
     launcher/qml/main.qml\
-    launcher/qml/run.qml
+    launcher/qml/run.qml \
+    launcher/qml/execvalueparser.js
 
 SUBDIRS += \
     raspad-launcher.pro

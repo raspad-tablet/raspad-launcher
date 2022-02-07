@@ -2,6 +2,7 @@
   <qresource prefix="/">
     <file>launcher/qml/main.qml</file>
     <file>launcher/qml/run.qml</file>
+    <file>launcher/qml/execvalueparser.js</file>
     <file>launcher/images/Internet.png</file>
     <file>launcher/images/Games.png</file>
     <file>launcher/images/Graphics.png</file>

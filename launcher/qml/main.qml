@@ -4,6 +4,9 @@ import QtQuick.Layouts 1.3
 import Process 1.0
 import QtQuick.Window 2.2
 import Qt.labs.folderlistmodel 2.0
+import QtQuick.Dialogs 1.1
+import "execvalueparser.js" as Parser
+import FileInfo 1.0
 
 ApplicationWindow {
     id: window
@@ -21,15 +24,16 @@ ApplicationWindow {
     property int iconGridHeight: 200
     property int iconWidth: 130
     property int iconHeight: 130
-    property bool systemApplicationsFolderListDone: false
     property bool userApplicationsFolderListDone: false
+    property bool raspiUiOverridesApplicationsFolderListDone: false
+    property bool systemApplicationsFolderListDone: false
     property bool isLoadApplicationTriggered: false
 
     property int lang
     property string langName: ""
     property var appData: {}
     property var categoriedAppList: {
-        "Home": ["Scratch 3", "Ezblock Studio", "Chromium Web Browser", "Minecraft Pi", "mu", "LibreOffice Writer", "LibreOffice Calc", "LibreOffice Impress", "File Manager PCManFM", "LXTerminal", "FAQ"],
+        "Home": ["scratch3.desktop", "Ezblock Studio ???.desktop", "chromium-browser.desktop", "minecraft-pi.desktop", "mu.codewith.editor.desktop", "libreoffice-writer.desktop", "libreoffice-calc.desktop", "libreoffice-impress.desktop", "pcmanfm.desktop", "lxterminal.desktop", "raspad-faq.desktop"],
         "Programming": [],
         "Education": [],
         "Office": [],
@@ -43,19 +47,19 @@ ApplicationWindow {
     }
     // AudioVideo, Development, Education, Game, Graphics, Network, Office, Settings, System, Utility.
     property var categoryRule: {
-        "Programming": ["Development", "IDE", "ComputeSicence"],
+        "Programming": ["Development", "IDE", "ComputerScience"],
         "Education": ["Education", "Science", "Math"],
         "Office": ["Office"],
         "Internet": ["Network", "WebBrowser", "Email", "RemoteAccess"],
         "SoundNVideo": ["AudioVideo", "Player", "Recorder", "Audio", "Video", "Midi", "X-Alsa", "X-Jack"],
-        "Graphics": ["Graphics", "2DGraphics", "Phtography"],
+        "Graphics": ["Graphics", "2DGraphics", "Photography"],
         "Games": ["Game"],
-        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "Qt", "PackageManager", "FileTools", "FileManager", "TextEditor"],
+        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "PackageManager", "FileTools", "FileManager", "TextEditor"],
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
-    property var blacklist: ["Squeak", "Wolfram"]
-    property var whitelist: ["Screen Configuration", "Bookshelf"]
+    property var blacklist: ["squeak.desktop", "wolfram-language.desktop"]
+    property var whitelist: ["arandr.desktop", "rp-bookshelf.desktop"]
     property var currentCategory: "Home"
 
     property string errorNetwork: qsTr("Network Error")
@@ -233,8 +237,14 @@ ApplicationWindow {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        process.start("lxde-pi-shutdown-helper", [])
-                        timer.start()
+                        process.setProgram("lxde-pi-shutdown-helper");
+                        process.setArguments([]);
+                        process.setWorkingDirectoryHome()
+                        process.setStandardFilesToNull();
+
+                        if (process.startDetached()) {
+                            Qt.quit();
+                        }
                     }
                 }
                 Image {
@@ -362,28 +372,47 @@ ApplicationWindow {
                         anchors.fill: parent
                         onClicked: {
                             // log("Icon on click" + JSON.stringify(categoriedAppList[currentCategory][appName]));
-                            var arguments = appData[appName].appParam
-                            process.setProgram(appExec)
-                            process.setArguments(arguments)
-                            process.startDetached()
-                            killTimer.start()
+                            var result = Parser.parseCommandLine(appData[appName])
+                            if (result.length === 0) {
+                                messageBox.text = "Desktop entry contains no valid Exec line!";
+                                messageBox.open();
+                                return;
+                            }
+                            var executable = result[0];
+                            var args = result.slice(1);
+                            if (!fileinfo.exexcutableFileExists(executable)) {
+                                messageBox.text = "Invalid desktop file: '" + appUrl + "'";
+                                messageBox.open();
+                                return;
+                            }
+                            if (appInTerminal) {
+                                executable = "lxterminal"
+                                args = result;
+                                args.unshift("-e");
+                            }
+                            process.setProgram(executable);
+                            process.setArguments(args);
+                            if (appPath) {
+                                process.setWorkingDirectory(appPath);
+                            } else {
+                                process.setWorkingDirectoryHome()
+                            }
+                            // Detach process from current stdin, stdout,
+                            // stderr, so that especially console programs
+                            // don't clutter the console of our launcher.
+                            process.setStandardFilesToNull();
+
+                            if (process.startDetached()) {
+                               Qt.quit();
+                            } else {
+                               messageBox.text = "Error starting command of desktop file: '" + appUrl + "'";
+                               messageBox.open();
+                            }
                         }
-                    }
-                    Timer {
-                        id: killTimer
-                        interval: 500
-                        running: false
-                        onTriggered: {
-                            // log("killTimer: Kill myself")
-                            processkill.start("killall", ["raspad-launcher"])
-                        }
-                    }
-                    Process {
-                        id: processkill
                     }
                 }
             }
-            Component.onCompleted: reloadAppList(qsTr("Home"))
+            Component.onCompleted: reloadAppList(qsTr(currentCategory))
         }
     }
 
@@ -406,6 +435,13 @@ ApplicationWindow {
         }
     }
 
+    MessageDialog {
+        id: messageBox
+        title: window.title
+        icon: StandardIcon.Critical
+        modality: Qt.ApplicationModal
+    }
+
     // 系统安装APP的文件获取模型
     FolderListModel {
         id: systemApplicationsFolderList
@@ -424,6 +460,15 @@ ApplicationWindow {
             loadApplicationTimer.start();
         }
     }
+    // 用户安装APP的文件获取模型
+    FolderListModel {
+        id: raspiUiOverridesApplicationsFolderList
+        folder: "file:///usr/share/raspi-ui-overrides/applications"
+        nameFilters: ["*.desktop"]
+        Component.onCompleted: {
+            loadApplicationTimer.start();
+        }
+    }
 
     function loadFromFolderListModel(folderList) {
         // log("loadFromFolderListModel(")
@@ -437,6 +482,13 @@ ApplicationWindow {
             //     log("Ignore: " + url)
             //     continue
             // }
+            var filePath = url.toString().slice(7);
+            var urllist = filePath.split("/")
+            var fileID = urllist[urllist.length - 1];
+            if (appData[fileID]) {
+                // application fileID has been already seen.
+                continue;
+            }
             var result = readFile(url, true);
 
             if (result === false) {
@@ -451,9 +503,10 @@ ApplicationWindow {
             var displayName = "";
             var icon = "";
             var exec = "";
-            var param = [];
+            var path = "";
             var categories = [];
             var desktopType = "";
+            var inTerminal = false;
             var isShow = true;
             var isWhiteListed = false;
 
@@ -499,25 +552,15 @@ ApplicationWindow {
                     icon = value;
                 } else if (arg === "Exec") {
                     exec = value;
-                    if (exec.indexOf(",") !== -1) {
-                        exec = exec.split(",");
-                        param = exec.slice(1);
-                        exec = exec[0];
-                    } else if (exec.indexOf(" ") !== -1) {
-                        exec = exec.split(" ");
-                        param = exec.slice(1);
-                        exec = exec[0];
+                } else if (arg === "Path") {
+                    path = value;
+                } else if (arg === "TryExec") {
+                    if (!fileinfo.exexcutableFileExists(value)) {
+                        isShow = false;
                     }
-                    var newParam = [];
-                    for (var paramI = 0; paramI < param.length; paramI++) {
-                        if (!param[paramI].startsWith("%")) {
-                            newParam.push(param[paramI]);
-                        }
-                    }
-                    param = newParam;
                 } else if (arg === "Terminal") {
                     if (value === "true") {
-                        isShow = false;
+                        inTerminal = true;
                     }
                 } else if (arg === "NoDisplay") {
                     // log("NoDisplay true: " + url);
@@ -530,7 +573,7 @@ ApplicationWindow {
                     }
                 }
             }
-            url = url.toString().slice(7);
+            url = filePath
             displayName = name;
             // if (genericName !== "" && genericName.length < 25){
             //     displayName = genericName;
@@ -538,37 +581,35 @@ ApplicationWindow {
             if (localName !== "") {
                 displayName = localName;
             }
-            if (blacklist.indexOf(name) !== -1) {
+            if (blacklist.indexOf(fileID) !== -1) {
                 isShow = false;
             }
-            if (whitelist.indexOf(name) !== -1) {
+            if (whitelist.indexOf(fileID) !== -1) {
                 isWhiteListed = true;
-                // log("White List: " + name);
-            }
-            if (!isShow && !isWhiteListed) {
-                // log("Terminal App, Skip: " + url);
-                continue;
+                // log("White List: " + fileID);
             }
             var added = false;
-            appData[name] = {
-                "appName": name,
+            appData[fileID] = {
+                "appName": fileID,
                 "displayName": displayName,// Todo: add display name translation
                 "appCategories": categories,
                 "appIcon": icon,
                 "appUrl": url,
                 "appExec": exec,
-                "appParam": param
+                "appPath": path,
+                "appInTerminal": inTerminal,
+                "appIsShow" : isShow || isWhiteListed
             }
-            // log("appData[" + name + "]:")
-            // logObj(appData[name]);
+            // log("appData[" + fileID + "]:")
+            // logObj(appData[fileID]);
             // log("categories.length: " + categories.length);
             // log("categories: ");
             // logList(categories);
 
             for (var l = 0; l < categories.length; l++) {
                 for (category in categoryRule) {
-                    if (categoryRule[category].indexOf(categories[l]) !== -1 && categoriedAppList[category].indexOf(name) === -1) {
-                        categoriedAppList[category].push(name);
+                    if (categoryRule[category].indexOf(categories[l]) !== -1 && categoriedAppList[category].indexOf(fileID) === -1) {
+                        categoriedAppList[category].push(fileID);
                         added = true;
                         break;
                     }
@@ -583,7 +624,6 @@ ApplicationWindow {
         }
         // log("categoriedAppList")
         // logObj(categoriedAppList)
-        reloadAppList();
     }
     function isFileExist(path) {
         var xhr = new XMLHttpRequest()
@@ -620,6 +660,7 @@ ApplicationWindow {
             "/usr/share/icons/hicolor/64x64/apps/",
             "/usr/share/icons/hicolor/48x48/apps/",
             "/usr/share/icons/hicolor/32x32/apps/",
+            "/usr/share/icons/hicolor/scalable/apps/",
             "/usr/share/icons/gnome/256x256/apps/",
             "/usr/share/icons/gnome/128x128/apps/",
             "/usr/share/icons/gnome/64x64/apps/",
@@ -631,7 +672,15 @@ ApplicationWindow {
             "/usr/share/pixmaps/"
         ];
         for (var i = 0; i < testList.length; i++) {
-            var path = "file://" + testList[i] + icon + ".png"
+            var path_pre = "file://" + testList[i] + icon
+            var path = path_pre
+            if (icon.indexOf(".png") == -1 && icon.indexOf(".svg") == -1) {
+                path = path_pre + ".png"
+                if (isFileExist(path)) {
+                    return path
+                }
+                path = path_pre + ".svg"
+            }
             if (isFileExist(path)) {
                 return path
             }
@@ -647,19 +696,22 @@ ApplicationWindow {
         appDrawList.clear();
         // log("loader.visible: " + loader.visible)
         if (loader.visible) {
-            loadApplicationTimer.start();
             loader.visible = false;
             loader.source = "";
             appDraw.visible = true;
-        } else {
-            var programs = categoriedAppList[currentCategory];
-            // log("programs: " + programs);
-            // log("programs.length: " + programs.length);
-            for (var i = 0; i < programs.length; i++) {
-                var appName = programs[i];
-                var app = appData[appName];
-                // log("app:");
-                // logObj(app);
+        }
+        if (!appData) {
+            return;
+        }
+        var programs = categoriedAppList[currentCategory];
+        // log("programs: " + programs);
+        // log("programs.length: " + programs.length);
+        for (var i = 0; i < programs.length; i++) {
+            var appName = programs[i];
+            var app = appData[appName];
+            // log("app:");
+            // logObj(app);
+            if (app && app.appIsShow) {
                 appDrawList.append(app);
             }
         }
@@ -674,7 +726,9 @@ ApplicationWindow {
             log("Categories: " + app.appCategories);
             log("Icon: " + app.appIcon);
             log("Exec: " + app.appExec);
-            log("Param: " + app.appParam);
+            log("Path: " + app.appPath);
+            log("Terminal: " + app.appInTerminal);
+            log("isShow: " + app.appIsShow);
         }
     }
 
@@ -727,15 +781,10 @@ ApplicationWindow {
     // To load icons from folder list
     Timer {
         id: loadApplicationTimer
-        interval: 500
+        interval: 1
         running: false
         onTriggered: {
             if (isLoadApplicationTriggered) {
-                return;
-            }
-            // if systemApplicationsFolderList is not Ready, Try again
-            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
                 return;
             }
             // if userApplicationsFolderList is not Ready, Try again
@@ -743,27 +792,33 @@ ApplicationWindow {
                 loadApplicationTimer.start();
                 return;
             }
+            // if raspiUiOverridesApplicationsFolderList is not Ready, Try again
+            if (raspiUiOverridesApplicationsFolderList.status !== FolderListModel.Ready) {
+                loadApplicationTimer.start();
+                return;
+            }
+            // if systemApplicationsFolderList is not Ready, Try again
+            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
+                loadApplicationTimer.start();
+                return;
+            }
             isLoadApplicationTriggered = true;
             appData = {};
-            loadFromFolderListModel(systemApplicationsFolderList);
             loadFromFolderListModel(userApplicationsFolderList);
+            loadFromFolderListModel(raspiUiOverridesApplicationsFolderList);
+            loadFromFolderListModel(systemApplicationsFolderList);
+            reloadAppList();
             isLoadApplicationTriggered = false;
-        }
-    }
-
-    // To kill itself after launcher an application
-    Timer {
-        id: timer
-        interval: 100
-        running: false
-        onTriggered: {
-            process.start("killall", ["raspad-launcher"])
         }
     }
 
     // For running command
     Process {
         id: process
+    }
+    // For finding command
+    FileInfo {
+        id: fileinfo
     }
 
 }

@@ -25,13 +25,21 @@ Checkout [Installation Guide](docs/installation-guide.md)
 Install build dependencies
 
 ```bash
-sudo apt install -y qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools qttools5-dev qtdeclarative5-devqml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2
+sudo apt install -y qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools qttools5-dev qtdeclarative5-devqml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2 qml-module-qtquick-dialogs qml-module-qtquick-controls
 ```
 
 Make
 
 ```bash
 qmake
+make
+```
+
+For raspbian bullseye, you need:
+
+```bash
+sudo apt -y install qtdeclarative5-dev qt5-qmake qtbase5-dev qtbase5-dev-tools qttools5-dev qml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2 qml-module-qtquick-dialogs qml-module-qtquick-controls
+qmake -qt=qt5
 make
 ```
 

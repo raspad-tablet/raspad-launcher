@@ -64,10 +64,15 @@ Install qt dependencies:
 
 ```bash
 sudo apt update
-sudo apt install qml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2
+sudo apt install qml-module-qt-labs-folderlistmodel qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-window2 qml-module-qtquick2 qml-module-qtgraphicaleffects libqt5quickcontrols2-5 libqt5quicktemplates2-5 qml-module-qtquick-templates2 qml-module-qtquick-dialogs qml-module-qtquick-controls
 ```
 
-> You don't need this if you are just upgrading.
+> If you are just upgrading, you don't need this. But you need to install the following new dependency, if you get the error message that the module QtQuick.Dialogs is missing:
+
+```bash
+sudo apt update
+sudo apt install qml-module-qtquick-dialogs qml-module-qtquick-controls
+```
 
 Copy RasPad Launcher related files including binary file, desktop profile, icon, raspad-launcher-helper and raspad-faq desktop profile.
 
