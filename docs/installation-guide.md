@@ -186,7 +186,8 @@ Click close and it's Done.
 #### Uninstall screen auto rotator
 
 ```bash
-sudo pip3 uninstall sh3001
-sudo rm -rf /usr/bin/rotate-helper
-sudo rm -rf /home/pi/.config/auto-rotator
+cd raspad-auto-rotator
+sudo python3 uninstall.py
+cd ..
+rm -rf raspad-auto-rotator
 ```
