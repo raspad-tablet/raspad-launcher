@@ -126,8 +126,8 @@ Here's something you might want to install.
 The display auto rotator for Accl SHIM
 
 ```bash
-git clone --depth=1 https://github.com/sunfounder/python-sh3001
-cd python-sh3001
+git clone --depth=1 https://github.com/raspad-tablet/raspad-auto-rotator
+cd raspad-auto-rotator
 sudo python3 install.py
 cd ..
 ```
