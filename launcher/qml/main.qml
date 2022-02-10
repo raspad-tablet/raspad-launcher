@@ -358,14 +358,14 @@ ApplicationWindow {
                             // log("Icon on click" + JSON.stringify(categoriedAppList[currentCategory][appName]));
                             var result = Parser.parseCommandLine(appData[appName])
                             if (result.length === 0) {
-                                messageBox.text = "Desktop entry contains no valid Exec line!";
+                                messageBox.text = qsTr("Desktop file '%1'\ncontains no valid Exec line!").arg(appUrl);
                                 messageBox.open();
                                 return;
                             }
                             var executable = result[0];
                             var args = result.slice(1);
                             if (!fileinfo.exexcutableFileExists(executable)) {
-                                messageBox.text = "Invalid desktop file: '" + appUrl + "'";
+                                messageBox.text = qsTr("Invalid desktop file: '%1'").arg(appUrl);
                                 messageBox.open();
                                 return;
                             }
@@ -389,7 +389,7 @@ ApplicationWindow {
                             if (process.startDetached()) {
                                Qt.quit();
                             } else {
-                               messageBox.text = "Error starting command of desktop file: '" + appUrl + "'";
+                               messageBox.text = qsTr("Error starting command of desktop file: '%1'").arg(appUrl);
                                messageBox.open();
                             }
                         }
