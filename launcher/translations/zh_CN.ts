@@ -77,17 +77,18 @@
         <location filename="../qml/main.qml" line="361"/>
         <source>Desktop file &apos;%1&apos;
 contains no valid Exec line!</source>
-        <translation type="unfinished"></translation>
+        <translation>桌面文件 &apos;%1&apos;
+没有包含可执行命令！</translation>
     </message>
     <message>
         <location filename="../qml/main.qml" line="368"/>
         <source>Invalid desktop file: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>桌面文件格式错误: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../qml/main.qml" line="392"/>
         <source>Error starting command of desktop file: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>桌面文件运行失败: &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -100,17 +101,17 @@ contains no valid Exec line!</source>
     <message>
         <location filename="../qml/run.qml" line="75"/>
         <source>Text is empty (or only consists of whitespace).</source>
-        <translation type="unfinished"></translation>
+        <translation>命令不可为空，或只包含空格键。</translation>
     </message>
     <message>
         <location filename="../qml/run.qml" line="82"/>
         <source>Invalid command line!</source>
-        <translation type="unfinished"></translation>
+        <translation>命令错误！</translation>
     </message>
     <message>
         <location filename="../qml/run.qml" line="97"/>
         <source>Error starting command!</source>
-        <translation type="unfinished"></translation>
+        <translation>命令运行失败！</translation>
     </message>
 </context>
 </TS>
