@@ -21,15 +21,11 @@
     <file>launcher/images/Programming.png</file>
     <file>launcher/images/Preferences.png</file>
     <file>launcher/images/back.png</file>
-    <file>launcher/translations/base.qm</file>
-    <file>launcher/translations/base.ts</file>
-    <file>launcher/translations/zh_CN.ts</file>
     <file>launcher/translations/zh_CN.qm</file>
-    <file>launcher/translations/en_US.ts</file>
+    <file>launcher/translations/zh.qm</file>
     <file>launcher/translations/en_US.qm</file>
-    <file>launcher/src/language.h</file>
-    <file>launcher/src/language.cpp</file>
-    <file>launcher/src/process.h</file>
-    <file>launcher/src/main.cpp</file>
+    <file>launcher/translations/en.qm</file>
+    <file>launcher/translations/de_DE.qm</file>
+    <file>launcher/translations/de.qm</file>
   </qresource>
 </RCC>

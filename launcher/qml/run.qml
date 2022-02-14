@@ -72,14 +72,14 @@ Rectangle {
     function startCommand() {
         var result = Parser.doEscapingSecondLevelAndSplitArguments(input.text)
         if (result.length === 0) {
-            messageBox.text = "Text is empty (or only consists of whitespace).";
+            messageBox.text = qsTr("Text is empty (or only consists of whitespace).");
             messageBox.open();
             return;
         }
         var executable = result[0];
         var args = result.slice(1);
         if (executable === '') {
-            messageBox.text = "Invalid command line!";
+            messageBox.text = qsTr("Invalid command line!");
             messageBox.open();
             return;
         }
@@ -94,7 +94,7 @@ Rectangle {
         if (process.startDetached()) {
             Qt.quit();
         } else {
-           messageBox.text = "Error starting command!";
+           messageBox.text = qsTr("Error starting command!");
            messageBox.open();
         }
     }

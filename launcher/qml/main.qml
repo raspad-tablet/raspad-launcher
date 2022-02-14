@@ -18,7 +18,6 @@ ApplicationWindow {
     flags: Qt.FramelessWindowHint
     title: 'RasPad Launcher'
 
-    property string setlang
     property string settime
     property int iconGridWidth: 178
     property int iconGridHeight: 200
@@ -29,8 +28,6 @@ ApplicationWindow {
     property bool systemApplicationsFolderListDone: false
     property bool isLoadApplicationTriggered: false
 
-    property int lang
-    property string langName: ""
     property var appData: {}
     property var categoriedAppList: {
         "Home": ["scratch3.desktop", "Ezblock Studio ???.desktop", "chromium-browser.desktop", "minecraft-pi.desktop", "mu.codewith.editor.desktop", "libreoffice-writer.desktop", "libreoffice-calc.desktop", "libreoffice-impress.desktop", "pcmanfm.desktop", "lxterminal.desktop", "raspad-faq.desktop"],
@@ -54,7 +51,7 @@ ApplicationWindow {
         "SoundNVideo": ["AudioVideo", "Player", "Recorder", "Audio", "Video", "Midi", "X-Alsa", "X-Jack"],
         "Graphics": ["Graphics", "2DGraphics", "Photography"],
         "Games": ["Game"],
-        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "PackageManager", "FileTools", "FileManager", "TextEditor"],
+        "Accessories": ["System", "Utility", "Archiving", "Compression", "ConsoleOnly", "PackageManager", "FileTools", "FileManager", "TextEditor", "None"],
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
@@ -64,22 +61,10 @@ ApplicationWindow {
 
     property string errorNetwork: qsTr("Network Error")
 
-    // Set language after everythings done
-    Component.onCompleted: {
-        var l = Qt.locale().name.substring(0,2);
-        // log(l);
-        if (l == "zh") {
-            lang = 1;
-        } else {
-            lang = 0;
-        }
-        language.setLanguage(lang);
-    }
-
     // Panel
     Rectangle {
         id: panel
-        width: 242
+        width: listView.width + 20
         height: parent.height
         anchors {
             top: parent.top
@@ -170,7 +155,7 @@ ApplicationWindow {
 
         ListView {
             id: listView
-            width: 222
+            width: 242
             clip: true
             interactive: false
             anchors {
@@ -209,7 +194,6 @@ ApplicationWindow {
                     // log("currentCategory: "+ currentCategory);
                     if (categoriedAppList[currentCategory] === undefined) {
                         loader.source = model.page.toLowerCase() + ".qml";
-                        // language.setLanguage(lang);
                     } else {
                         reloadAppList(model.name);
                     }
@@ -374,14 +358,14 @@ ApplicationWindow {
                             // log("Icon on click" + JSON.stringify(categoriedAppList[currentCategory][appName]));
                             var result = Parser.parseCommandLine(appData[appName])
                             if (result.length === 0) {
-                                messageBox.text = "Desktop entry contains no valid Exec line!";
+                                messageBox.text = qsTr("Desktop file '%1'\ncontains no valid Exec line!").arg(appUrl);
                                 messageBox.open();
                                 return;
                             }
                             var executable = result[0];
                             var args = result.slice(1);
                             if (!fileinfo.exexcutableFileExists(executable)) {
-                                messageBox.text = "Invalid desktop file: '" + appUrl + "'";
+                                messageBox.text = qsTr("Invalid desktop file: '%1'").arg(appUrl);
                                 messageBox.open();
                                 return;
                             }
@@ -405,7 +389,7 @@ ApplicationWindow {
                             if (process.startDetached()) {
                                Qt.quit();
                             } else {
-                               messageBox.text = "Error starting command of desktop file: '" + appUrl + "'";
+                               messageBox.text = qsTr("Error starting command of desktop file: '%1'").arg(appUrl);
                                messageBox.open();
                             }
                         }
@@ -431,7 +415,6 @@ ApplicationWindow {
             // log("Load source: " + loader.source);
             loader.visible = true
             appDraw.visible = false
-            // language.setLanguage(lang)
         }
     }
 
@@ -497,18 +480,19 @@ ApplicationWindow {
             }
 
             var contents = result.split("\n");
-            var name = "";
-            var localName = "";
-            var genericName = "";
-            var displayName = "";
+            var name = {};
+            var genericName = {};
             var icon = "";
             var exec = "";
             var path = "";
-            var categories = [];
+            // Use "uncategorized" category, in case no categories are given.
+            var categories = ["None"];
             var desktopType = "";
             var inTerminal = false;
             var isShow = true;
             var isWhiteListed = false;
+            var locale = Qt.locale().name;
+            var lang = locale.substring(0,2);
 
             for (var j = 0; j < contents.length; j++) {
                 var line = contents[j];
@@ -525,19 +509,40 @@ ApplicationWindow {
                 if (desktopType !== "[Desktop Entry]") {
                     continue;
                 }
-                var temp = line.split("=");
-                var arg = temp[0];
-                var value = line.split(arg + "=")[1];
-                // log(langName);
-                if (arg === "Name") {
-                    name = value;
-                } else if (arg === "Name[" + langName + "]") {
-                    localName = value;
-                } else if (arg === "GenericName[" + langName + "]") {
-                    localName = value;
-                } else if (arg === "GenericName") {
-                    genericName = value;
-                } else if (arg === "Categories") {
+                var equalPos = line.indexOf('=');
+                if (equalPos === -1) {
+                    continue;
+                }
+                var arg = line.slice(0, equalPos);
+                var value = line.slice(equalPos + 1);
+
+                var match = arg.match(/^Name(\[([a-zA-Z0-9_@-]+)])?/);
+                if (match) {
+                    // Index 0 = whole matched string.
+                    // Index 2 = matched lang_COUNTRY string.
+                    if (match[2] === locale) {
+                        name["lang_COUNTRY"] = value;
+                    } else if (match[2] === lang) {
+                        name["lang"] = value;
+                    } else if (match[0] === "Name") {
+                        name["default"] = value;
+                    }
+                    continue;
+                }
+                match = arg.match(/^GenericName(\[([a-zA-Z0-9_@-]+)])?/);
+                if (match) {
+                    // Index 0 = whole matched string.
+                    // Index 2 = matched lang_COUNTRY string.
+                    if (match[2] === locale) {
+                        genericName["lang_COUNTRY"] = value;
+                    } else if (match[2] === lang) {
+                        genericName["lang"] = value;
+                    } else if (match[0] === "GenericName") {
+                        genericName["default"] = value;
+                    }
+                    continue;
+                }
+                if (arg === "Categories") {
                     categories = value.split(";");
                     for (var k = 0; k < categories.length; k++) {
                         var category = categories[k];
@@ -574,12 +579,24 @@ ApplicationWindow {
                 }
             }
             url = filePath
-            displayName = name;
-            // if (genericName !== "" && genericName.length < 25){
-            //     displayName = genericName;
-            // }
-            if (localName !== "") {
-                displayName = localName;
+            var displayName = "";
+            var keyOrder = ["lang_COUNTRY", "lang", "default"];
+            for (var k = 0; k < keyOrder.length; k++) {
+                if (name[keyOrder[k]]) {
+                    displayName = name[keyOrder[k]];
+                    break;
+                }
+            }
+            if (!displayName) {
+                for (var k = 0; k < keyOrder.length; k++) {
+                    if (genericName[keyOrder[k]]) {
+                        displayName = genericName[keyOrder[k]];
+                        break;
+                    }
+                }
+            }
+            if (!displayName) {
+                isShow = false;
             }
             if (blacklist.indexOf(fileID) !== -1) {
                 isShow = false;
@@ -591,7 +608,7 @@ ApplicationWindow {
             var added = false;
             appData[fileID] = {
                 "appName": fileID,
-                "displayName": displayName,// Todo: add display name translation
+                "displayName": displayName,
                 "appCategories": categories,
                 "appIcon": icon,
                 "appUrl": url,
@@ -689,7 +706,6 @@ ApplicationWindow {
     }
     function reloadAppList(name) {
         // log("reloadAppList(" + name + ")");
-        // language.setLanguage(lang);
         if (name !== undefined) {
             appDrawLabelText.text = name;
         }
