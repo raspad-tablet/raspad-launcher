@@ -5,6 +5,7 @@
     - [Why we abandon RasPad OS and launch RasPad Launcher](#why-we-abandon-raspad-os-and-launch-raspad-launcher)
   - [Installation Guide](#installation-guide)
   - [Rebuild guide](#rebuild-guide)
+  - [Known issues](#known-issues)
 
 ## Introduction
 
@@ -44,3 +45,8 @@ make
 ```
 
 And there you go.
+
+## Known issues
+
+1. Raspberry Pi Configuation German overflow
+2. Click OK on message box sometimes shows the top panel bar
