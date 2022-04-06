@@ -16,7 +16,8 @@ TRANSLATIONS += \
 
 HEADERS += \
     launcher/src/process.h \
-    launcher/src/fileinfo.h
+    launcher/src/fileinfo.h \
+    launcher/src/processenvironment.h
 
 DISTFILES += \
     launcher/images/Accessories.png \

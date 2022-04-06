@@ -7,6 +7,7 @@ import Qt.labs.folderlistmodel 2.0
 import QtQuick.Dialogs 1.1
 import "execvalueparser.js" as Parser
 import FileInfo 1.0
+import ProcessEnvironment 1.0
 
 ApplicationWindow {
     id: window
@@ -457,6 +458,8 @@ ApplicationWindow {
         // log("loadFromFolderListModel(")
         // logFolderList(folderList)
         // log(")")
+        var curDesktops = environment.getenv("XDG_CURRENT_DESKTOP").split(';');
+
         var all_categories = [];
         var desktops = [];
         for (var i = 0; i < folderList.count; i++) {
@@ -478,21 +481,11 @@ ApplicationWindow {
                 // log("Read file Error: " + url);
                 continue;
             }
+            url = filePath;
 
             var contents = result.split("\n");
-            var name = {};
-            var genericName = {};
-            var icon = "";
-            var exec = "";
-            var path = "";
-            // Use "uncategorized" category, in case no categories are given.
-            var categories = ["None"];
+            var map = {};
             var desktopType = "";
-            var inTerminal = false;
-            var isShow = true;
-            var isWhiteListed = false;
-            var locale = Qt.locale().name;
-            var lang = locale.substring(0,2);
 
             for (var j = 0; j < contents.length; j++) {
                 var line = contents[j];
@@ -515,96 +508,89 @@ ApplicationWindow {
                 }
                 var arg = line.slice(0, equalPos);
                 var value = line.slice(equalPos + 1);
+                map[arg] = value;
+            }
 
-                var match = arg.match(/^Name(\[([a-zA-Z0-9_@-]+)])?/);
-                if (match) {
-                    // Index 0 = whole matched string.
-                    // Index 2 = matched lang_COUNTRY string.
-                    if (match[2] === locale) {
-                        name["lang_COUNTRY"] = value;
-                    } else if (match[2] === lang) {
-                        name["lang"] = value;
-                    } else if (match[0] === "Name") {
-                        name["default"] = value;
-                    }
-                    continue;
-                }
-                match = arg.match(/^GenericName(\[([a-zA-Z0-9_@-]+)])?/);
-                if (match) {
-                    // Index 0 = whole matched string.
-                    // Index 2 = matched lang_COUNTRY string.
-                    if (match[2] === locale) {
-                        genericName["lang_COUNTRY"] = value;
-                    } else if (match[2] === lang) {
-                        genericName["lang"] = value;
-                    } else if (match[0] === "GenericName") {
-                        genericName["default"] = value;
-                    }
-                    continue;
-                }
-                if (arg === "Categories") {
-                    categories = value.split(";");
-                    for (var k = 0; k < categories.length; k++) {
-                        var category = categories[k];
-                        if (category === "") {
-                            continue;
-                        }
+            if (map["Type"] !== "Application") {
+                continue;
+            }
+
+            // Use "uncategorized" category, in case no categories are given.
+            var categories = ["None"];
+            if (map["Categories"]) {
+                categories = map["Categories"].split(";");
+                for (var k = 0; k < categories.length; k++) {
+                    var category = categories[k];
+                    if (category !== "") {
                         if (all_categories.indexOf(category) === -1) {
                             all_categories.push(category)
                         }
                     }
-                } else if (arg === "Icon") {
-                    icon = value;
-                } else if (arg === "Exec") {
-                    exec = value;
-                } else if (arg === "Path") {
-                    path = value;
-                } else if (arg === "TryExec") {
-                    if (!fileinfo.exexcutableFileExists(value)) {
-                        isShow = false;
-                    }
-                } else if (arg === "Terminal") {
-                    if (value === "true") {
-                        inTerminal = true;
-                    }
-                } else if (arg === "NoDisplay") {
-                    // log("NoDisplay true: " + url);
-                    if (value === "true") {
-                        isShow = false;
-                    }
-                } else if (arg === "NotShowIn") {
-                    if (value === "GNOME;KDE;XFCE;MATE;") {
-                        isShow = false;
-                    }
                 }
             }
-            url = filePath
-            var displayName = "";
-            var keyOrder = ["lang_COUNTRY", "lang", "default"];
-            for (var k = 0; k < keyOrder.length; k++) {
-                if (name[keyOrder[k]]) {
-                    displayName = name[keyOrder[k]];
-                    break;
-                }
-            }
-            if (!displayName) {
-                for (var k = 0; k < keyOrder.length; k++) {
-                    if (genericName[keyOrder[k]]) {
-                        displayName = genericName[keyOrder[k]];
+            var icon = map["Icon"] ? map["Icon"] : '';
+            var exec = map["Exec"] ? map["Exec"] : '';
+            var path = map["Path"] ? map["Path"] : '';
+
+            var isShow = true;
+            var onlyShowIn = map["OnlyShowIn"];
+            if (onlyShowIn) {
+                isShow = false;
+                for (var k = 0; k < curDesktops.length; k++) {
+                    if (onlyShowIn.indexOf(curDesktops[k]) !== -1) {
+                        isShow = true;
                         break;
                     }
                 }
             }
+            var notShowIn = map["NotShowIn"];
+            if (notShowIn) {
+                for (var k = 0; k < curDesktops.length; k++) {
+                    if (notShowIn.indexOf(curDesktops[k]) !== -1) {
+                        isShow = false;
+                        break;
+                    }
+                }
+            }
+
+            if (map["TryExec"]) {
+                if (!fileinfo.exexcutableFileExists(map["TryExec"])) {
+                    isShow = false;
+                }
+            }
+            var inTerminal = map["Terminal"] === "true";
+            if (map["NoDisplay"] === "true") {
+                isShow = false;
+            }
+
+            var locale = Qt.locale().name;
+            var lang = locale.substring(0,2);
+
+            var displayName = map["Name[" + locale + "]"];
+            if (!displayName) {
+                displayName = map["Name[" + lang + "]"];
+            }
+            if (!displayName) {
+                displayName = map["Name"];
+            }
+            if (!displayName) {
+                displayName = map["GenericName[" + locale + "]"];
+            }
+            if (!displayName) {
+                displayName = map["GenericName[" + lang + "]"];
+            }
+            if (!displayName) {
+                displayName = map["GenericName"];
+            }
             if (!displayName) {
                 isShow = false;
             }
+
             if (blacklist.indexOf(fileID) !== -1) {
                 isShow = false;
             }
-            if (whitelist.indexOf(fileID) !== -1) {
-                isWhiteListed = true;
-                // log("White List: " + fileID);
-            }
+            var isWhiteListed = whitelist.indexOf(fileID) !== -1;
+
             var added = false;
             appData[fileID] = {
                 "appName": fileID,
@@ -835,6 +821,10 @@ ApplicationWindow {
     // For finding command
     FileInfo {
         id: fileinfo
+    }
+    // For accessing the environment
+    ProcessEnvironment {
+        id: environment
     }
 
 }
