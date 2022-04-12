@@ -13,11 +13,19 @@ ApplicationWindow {
     id: window
     x: 0
     y: 0
+    width: Screen.width
+    height: Screen.height
     color: 'white'
     visible: true
     visibility: "FullScreen"
     flags: Qt.FramelessWindowHint
     title: 'RasPad Launcher'
+
+    onActiveChanged: {
+        if (!active) {
+            Qt.quit()
+        }
+    }
 
     property string settime
     property int iconGridWidth: 178
@@ -158,7 +166,7 @@ ApplicationWindow {
             id: listView
             width: 242
             clip: true
-            interactive: false
+            boundsBehavior: Flickable.StopAtBounds
             anchors {
                 top: logo.bottom
                 left: parent.left
@@ -195,8 +203,11 @@ ApplicationWindow {
                     // log("currentCategory: "+ currentCategory);
                     if (categoriedAppList[currentCategory] === undefined) {
                         loader.source = model.page.toLowerCase() + ".qml";
+                        window.visibility = "Windowed"
+                        window.showMaximized()
                     } else {
                         reloadAppList(model.name);
+                        window.showFullScreen()
                     }
                 }
                 background: Rectangle {
@@ -299,6 +310,7 @@ ApplicationWindow {
                 topMargin: 30
                 bottomMargin: 62
             }
+            ScrollBar.vertical: ScrollBar{}
             model: appDrawList
             delegate: Column {
                 Rectangle {
