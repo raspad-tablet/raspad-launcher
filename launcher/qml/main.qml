@@ -8,6 +8,7 @@ import QtQuick.Dialogs 1.1
 import "execvalueparser.js" as Parser
 import FileInfo 1.0
 import ProcessEnvironment 1.0
+import "xdgdirectories.js" as XDGDirs
 
 ApplicationWindow {
     id: window
@@ -645,7 +646,7 @@ ApplicationWindow {
 
     function generateIconSearchDirs() {
         var iconDirs = []
-        var iconBaseDirs = ["/usr/share/icons"]
+        var iconBaseDirs = XDGDirs.getXDGDataDirsSubdirs("icons");
 
         for (var i = 0; i < iconBaseDirs.length; i++) {
             var themes = ["PiXflat", "hicolor", "gnome"];
