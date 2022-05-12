@@ -355,9 +355,9 @@ ApplicationWindow {
                                 }
                                 result = _icon
                             } else {
-                                result = "file://" + appIcon
+                                result = appIcon
                             }
-                            return result
+                            return "file://" + result
                         }
                         anchors {
                             horizontalCenter: parent.horizontalCenter
@@ -640,18 +640,6 @@ ApplicationWindow {
         // log("categoriedAppList")
         // logObj(categoriedAppList)
     }
-    function isFileExist(path) {
-        var xhr = new XMLHttpRequest()
-        xhr.open("GET", path, false)
-        xhr.send()
-        if (xhr.readyState !== 4) {
-            return false
-        }
-        if (xhr.status !== 200) {
-            return false
-        }
-        return true
-    }
     function getIconPath(icon) {
         var testList = [
             "/usr/share/icons/PiXflat/256x256/apps/",
@@ -687,16 +675,16 @@ ApplicationWindow {
             "/usr/share/pixmaps/"
         ];
         for (var i = 0; i < testList.length; i++) {
-            var path_pre = "file://" + testList[i] + icon
+            var path_pre = testList[i] + icon
             var path = path_pre
             if (icon.indexOf(".png") == -1 && icon.indexOf(".svg") == -1) {
                 path = path_pre + ".png"
-                if (isFileExist(path)) {
+                if (fileinfo.isFile(path)) {
                     return path
                 }
                 path = path_pre + ".svg"
             }
-            if (isFileExist(path)) {
+            if (fileinfo.isFile(path)) {
                 return path
             }
         }
