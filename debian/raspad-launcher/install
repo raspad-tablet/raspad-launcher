@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 import os, sys
 import time
+import pwd
+import grp
+import platform
+
+username = os.getlogin()
+gid = pwd.getpwnam(username).pw_gid
+group_name = grp.getgrgid(gid)[0]
+struct = platform.architecture()[0]
+
+user_home = os.popen(f'getent passwd {username} | cut -d: -f 6').readline().strip()
 
 errors = []
 
@@ -15,6 +25,19 @@ Options:
                --no-dep     Do not download dependencies
     -h         --help       Show this help text and exit
 '''
+
+print(f'''
+###############################################################################
+#                                                                             #
+#                                RasPad Launcher                              #
+#                                                                             #
+###############################################################################
+Informations:
+Username: {username}
+User Group: {group_name}
+User Home Directory: {user_home}
+System Architecture: {struct}
+''')
 
 DEPENDENCIES = [
     "qml-module-qt-labs-folderlistmodel",
@@ -42,14 +65,23 @@ def install():
     if "-h" in options or "--help" in options:
         print(usage)
         quit()
-    print("RasPad Launcher install process starts")
+    print("RasPad Launcher installation starts")
+
+    if "struct == 64bit":
+        bin_name = "raspad-launcher-64"
+    elif "struct == 32bit":
+        bin_name = "raspad-launcher-32"
+    else:
+        print(f"[{colored("Fail", "red")}] Unknown system architecture: {struct}")
+        sys.exit(1)
+
 
     if "--no-dep" not in options:
         do(msg="Update apt",
             cmd='run_command("sudo apt update")')
         dep = " ".join(DEPENDENCIES)
         do(msg="Install dependencies",
-            cmd='run_command("sudo apt install %s -y")' % dep)
+            cmd=f'run_command("sudo apt install {dep} -y")')
 
     if os.path.isdir('/usr/local/qt5pi'):
         print("Uninstall Old Qt runtime")
@@ -64,21 +96,21 @@ def install():
     do(msg="Copy icon",
         cmd='run_command("cp ./icons/raspad.png /usr/share/icons/")')
     do(msg="Copy raspad-launcher",
-        cmd='run_command("cp ./bin/raspad-launcher /usr/local/bin/")')
+        cmd=f'run_command("cp ./bin/{bin_name} /usr/local/bin/raspad-launcher")')
     do(msg="Copy raspad-launcher-helper",
         cmd='run_command("cp ./bin/raspad-launcher-helper /usr/local/bin/")')
     do(msg="Add excute permission",
         cmd='run_command("chmod +x /usr/local/bin/raspad-launcher /usr/local/bin/raspad-launcher-helper")')
-    if os.path.isdir("/home/pi/.config/lxpanel/LXDE-pi/panels/panel"):
+    if os.path.isdir(f"{user_home}/.config/lxpanel/LXDE-pi/panels/panel"):
         do(msg="backup panel setting",
-            cmd='run_command("cp /home/pi/.config/lxpanel/LXDE-pi/panels/panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel.bak")')
+            cmd=f'run_command("cp {user_home}/.config/lxpanel/LXDE-pi/panels/panel {user_home}/.config/lxpanel/LXDE-pi/panels/panel.bak")')
     else:
         do(msg="cp panel settings",
-            cmd='run_command("sudo cp -r /etc/xdg/lxpanel /home/pi/.config/")')
+            cmd=f'run_command("sudo cp -r /etc/xdg/lxpanel {user_home}/.config/")')
         do(msg="change panel setting owner",
-            cmd='run_command("sudo chown -R pi:pi /home/pi/.config/lxpanel")')
+            cmd=f'run_command("sudo chown -R {username}:{group_name} {user_home}/.config/lxpanel")')
     do(msg="replace menu icon",
-        cmd='run_command("cp ./panel /home/pi/.config/lxpanel/LXDE-pi/panels/panel")')
+        cmd=f'run_command("cp ./panel {user_home}/.config/lxpanel/LXDE-pi/panels/panel")')
     do(msg="Reflash panel",
         cmd='run_command("export DISPLAY=:0.0 && lxpanelctl restart")')
 
@@ -120,155 +152,38 @@ def cleanup():
     os.chdir(install_path)
     os.remove("raspad-auto-rotator")
 
-class Modules(object):
-    ''' 
-        To setup /etc/modules
-    '''
-
-    def __init__(self, file="/etc/modules"):
-        self.file = file
-        with open(self.file, 'r') as f:
-            self.configs = f.read()
-        self.configs = self.configs.split('\n')
-
-    def remove(self, expected):
-        for config in self.configs:
-            if expected in config:
-                self.configs.remove(config)
-        return self.write_file()
-
-    def set(self, name):
-        have_excepted = False
-        for i in range(len(self.configs)):
-            config = self.configs[i]
-            if name in config:
-                have_excepted = True
-                tmp = name
-                self.configs[i] = tmp
-                break
-
-        if not have_excepted:
-            tmp = name
-            self.configs.append(tmp)
-        return self.write_file()
-
-    def write_file(self):
-        try:
-            config = '\n'.join(self.configs)
-            # print(config)
-            with open(self.file, 'w') as f:
-                f.write(config)
-            return 0, config
-        except Exception as e:
-            return -1, e
-
-class Config(object):
-    ''' 
-        To setup /boot/config.txt
-    '''
-    def __init__(self, file="/boot/config.txt"):
-        self.file = file
-        with open(self.file, 'r') as f:
-            self.configs = f.read()
-        self.configs = self.configs.split('\n')
-
-    def remove(self, expected):
-        for config in self.configs:
-            if expected in config:
-                self.configs.remove(config)
-        return self.write_file()
-
-    def set(self, name, value=None):
-        have_excepted = False
-        for i in range(len(self.configs)):
-            config = self.configs[i]
-            if name in config:
-                have_excepted = True
-                tmp = name
-                if value != None:
-                    tmp += '=' + value
-                self.configs[i] = tmp
-                break
-
-        if not have_excepted:
-            tmp = name
-            if value != None:
-                tmp += '=' + value
-            self.configs.append(tmp)
-        return self.write_file()
-
-    def write_file(self):
-        try:
-            config = '\n'.join(self.configs)
-            # print(config)
-            with open(self.file, 'w') as f:
-                f.write(config)
-            return 0, config
-        except Exception as e:
-            return -1, e
-
-class Cmdline(object):
-    ''' 
-        To setup /boot/cmdline.txt
-    '''
-    def __init__(self, file="/boot/cmdline.txt"):
-        self.file = file
-        with open(self.file, 'r') as f:
-            cmdline = f.read()
-        self.cmdline = cmdline.strip()
-        self.cmds = self.cmdline.split(' ')
-
-    def remove(self, expected):
-        for cmd in self.cmds:
-            if expected in cmd:
-                self.cmds.remove(cmd)
-        return self.write_file()
-
-    def write_file(self):
-        try:
-            cmdline = ' '.join(self.cmds)
-            # print(cmdline)
-            with open(self.file, 'w') as f:
-                f.write(cmdline)
-            return 0, cmdline
-        except Exception as e:
-            return -1, e
-
 def run_command(cmd=""):
     import subprocess
     p = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     result = p.stdout.read().decode('utf-8')
     status = p.poll()
-    # print(result)
-    # print(status)
     return status, result
 
 def colored(text, color):
     color = color.lower()
     colors = {
-        "grey": "\033[1;30m%s\033[0m",
-        "red": "\033[1;31m%s\033[0m",
-        "green": "\033[1;32m%s\033[0m",
-        "yellow": "\033[1;33m%s\033[0m",
-        "blue": "\033[1;34m%s\033[0m",
-        "purple": "\033[1;35m%s\033[0m",
-        "cyan": "\033[1;36m%s\033[0m",
-        "white": "\033[1;37m%s\033[0m",
+        "grey":   f"\033[1;30m{text}\033[0m",
+        "red":    f"\033[1;31m{text}\033[0m",
+        "green":  f"\033[1;32m{text}\033[0m",
+        "yellow": f"\033[1;33m{text}\033[0m",
+        "blue":   f"\033[1;34m{text}\033[0m",
+        "purple": f"\033[1;35m{text}\033[0m",
+        "cyan":   f"\033[1;36m{text}\033[0m",
+        "white":  f"\033[1;37m{text}\033[0m",
     }
-    return colors[color] % text
+    return colors[color]
 
 def do(msg="", cmd=""):
-    print("[    ] %s..." % (msg), end='', flush=True)
+    print(f"[    ] {msg}...", end='', flush=True)
     status, result = eval(cmd)
     # print(status, result)
     if status == 0 or status == None or result == "":
-        print('\r[ %s ]' % colored("OK", "green"))
+        print(f'\r[ {colored("OK", "green")} ]')
         return True
     else:
-        print('\r[%s]' % colored("Fail", "red"))
-        errors.append("%s error:\n  Status:%s\n  Error:%s" %
-                      (msg, status, result))
+        print(f'\r[{colored("Fail", "red")}]')
+        errors.append(f"{msg} error:\n  Status: {status}\n  Error: {result}")
         return False
 
 def check_sudo():
