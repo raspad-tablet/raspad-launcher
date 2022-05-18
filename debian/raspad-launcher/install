@@ -5,6 +5,7 @@ import time
 errors = []
 
 avaiable_options = ['-h', '--help', '--no-dep']
+install_path = os.getcwd()
 
 usage = '''
 Usage:
@@ -89,6 +90,9 @@ def install():
     # sudo apt install onboard
 
     print("Install screen auto rotator")
+    if os.path.isdir("raspad-auto-rotator"):
+        do(msg="Remove old auto rotator",
+            cmd='run_command("rm -rf raspad-auto-rotator")')
     do(msg="Clone package",
         cmd='run_command("git clone --depth=1 https://github.com/raspad-tablet/raspad-auto-rotator")')
     os.chdir("raspad-auto-rotator")
@@ -113,6 +117,7 @@ def install():
         sys.exit(1)
 
 def cleanup():
+    os.chdir(install_path)
     os.remove("raspad-auto-rotator")
 
 class Modules(object):
