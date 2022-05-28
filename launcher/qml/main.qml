@@ -775,9 +775,10 @@ ApplicationWindow {
     }
 
     function createFolderListModels() {
-        var appFolders = ["/home/pi/.local/share/applications",
-                          "/usr/share/raspi-ui-overrides/applications",
-                          "/usr/share/applications"];
+        var appFolders = XDGDirs.getXDGDataDirsSubdirs("applications");
+        // log("appFolders");
+        // logList(appFolders);
+
         appFolderListModels = [];
         for (var i = 0; i < appFolders.length; i++) {
              var appFolderListModel =
