@@ -70,8 +70,8 @@ ApplicationWindow {
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
-    property var blacklist: ["squeak.desktop", "wolfram-language.desktop"]
-    property var whitelist: ["arandr.desktop", "rp-bookshelf.desktop"]
+    property var blacklist: ["wolfram-language.desktop"]
+    property var whitelist: []
     property var currentCategory: "Home"
 
     property string errorNetwork: qsTr("Network Error")
