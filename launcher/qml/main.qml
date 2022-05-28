@@ -28,6 +28,11 @@ ApplicationWindow {
         }
     }
 
+    Component.onCompleted: {
+        createFolderListModels();
+        loadApplicationTimer.start();
+    }
+
     property string settime
     property int iconGridWidth: 178
     property int iconGridHeight: 200
@@ -72,6 +77,7 @@ ApplicationWindow {
     property string errorNetwork: qsTr("Network Error")
 
     property var iconDirs: generateIconSearchDirs()
+    property var appFolderListModels: []
 
     // Panel
     Rectangle {
@@ -441,31 +447,13 @@ ApplicationWindow {
         modality: Qt.ApplicationModal
     }
 
-    // 系统安装APP的文件获取模型
-    FolderListModel {
-        id: systemApplicationsFolderList
-        folder: "file:///usr/share/applications"
-        nameFilters: ["*.desktop"]
-        Component.onCompleted: {
-            loadApplicationTimer.start();
-        }
-    }
-    // 用户安装APP的文件获取模型
-    FolderListModel {
-        id: userApplicationsFolderList
-        folder: "file:///home/pi/.local/share/applications"
-        nameFilters: ["*.desktop"]
-        Component.onCompleted: {
-            loadApplicationTimer.start();
-        }
-    }
-    // 用户安装APP的文件获取模型
-    FolderListModel {
-        id: raspiUiOverridesApplicationsFolderList
-        folder: "file:///usr/share/raspi-ui-overrides/applications"
-        nameFilters: ["*.desktop"]
-        Component.onCompleted: {
-            loadApplicationTimer.start();
+    Component {
+        id: folderListModelComponent
+
+        // 系统安装APP的文件获取模型
+        // 用户安装APP的文件获取模型
+        FolderListModel {
+             nameFilters: ["*.desktop"]
         }
     }
 
@@ -786,6 +774,25 @@ ApplicationWindow {
         return result
     }
 
+    function createFolderListModels() {
+        var appFolders = ["/home/pi/.local/share/applications",
+                          "/usr/share/raspi-ui-overrides/applications",
+                          "/usr/share/applications"];
+        appFolderListModels = [];
+        for (var i = 0; i < appFolders.length; i++) {
+             var appFolderListModel =
+                                folderListModelComponent.createObject(window,
+                                          {folder: 'file://' + appFolders[i]})
+             if (appFolderListModel !== null) {
+                 appFolderListModels.push(appFolderListModel);
+             }
+             else {
+                 console.log('Could not create FolderListModel for folder',
+                             appFolders[i]);
+             }
+        }
+    }
+
     // To load icons from folder list
     Timer {
         id: loadApplicationTimer
@@ -795,26 +802,18 @@ ApplicationWindow {
             if (isLoadApplicationTriggered) {
                 return;
             }
-            // if userApplicationsFolderList is not Ready, Try again
-            if (userApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
-            }
-            // if raspiUiOverridesApplicationsFolderList is not Ready, Try again
-            if (raspiUiOverridesApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
-            }
-            // if systemApplicationsFolderList is not Ready, Try again
-            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
+            for (var i = 0; i < appFolderListModels.length; i++) {
+                // if any FolderListModel is not Ready, Try again
+                if (appFolderListModels[i].status !== FolderListModel.Ready) {
+                    loadApplicationTimer.start();
+                    return;
+                }
             }
             isLoadApplicationTriggered = true;
             appData = {};
-            loadFromFolderListModel(userApplicationsFolderList);
-            loadFromFolderListModel(raspiUiOverridesApplicationsFolderList);
-            loadFromFolderListModel(systemApplicationsFolderList);
+            for (var i = 0; i < appFolderListModels.length; i++) {
+                loadFromFolderListModel(appFolderListModels[i]);
+            }
             reloadAppList();
             isLoadApplicationTriggered = false;
         }
