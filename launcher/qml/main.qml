@@ -30,6 +30,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         createFolderListModels();
+        iconDirs = generateIconSearchDirs();
         loadApplicationTimer.start();
     }
 
@@ -76,7 +77,7 @@ ApplicationWindow {
 
     property string errorNetwork: qsTr("Network Error")
 
-    property var iconDirs: generateIconSearchDirs()
+    property var iconDirs: []
     property var appFolderListModels: []
 
     // Panel
