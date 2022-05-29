@@ -645,7 +645,7 @@ ApplicationWindow {
                 if (!fileinfo.isDir(themeDir)) {
                     continue;
                 }
-                var sections = ["apps", "devices", "places" , "categories"];
+                var sections = ["apps", "devices", "places" , "categories", "status"];
 
                 for (var k = 0; k < sections.length; k++) {
                     var resolutions = ["256x256", "128x128", "64x64",
