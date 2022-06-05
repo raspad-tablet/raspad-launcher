@@ -795,7 +795,7 @@ ApplicationWindow {
         }
     }
 
-    // To load icons from folder list
+    // Load *.desktop files from folder lists.
     Timer {
         id: loadApplicationTimer
         interval: 1
