@@ -72,7 +72,8 @@ def install():
     elif "struct == 32bit":
         bin_name = "raspad-launcher-32"
     else:
-        print(f"[{colored("Fail", "red")}] Unknown system architecture: {struct}")
+        fail_string = colored("Fail", "red")
+        print(f"[{fail_string}] Unknown system architecture: {struct}")
         sys.exit(1)
 
 
