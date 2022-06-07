@@ -2,7 +2,6 @@
 .vscode/sftp.json
 *.zip
 .qmake.stash
-debian/*
 *.o
 Makefile
 moc_*
