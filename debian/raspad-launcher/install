@@ -4,6 +4,7 @@ import time
 import pwd
 import grp
 import platform
+import shutil
 
 username = os.getlogin()
 gid = pwd.getpwnam(username).pw_gid
@@ -67,9 +68,9 @@ def install():
         quit()
     print("RasPad Launcher installation starts")
 
-    if "struct == 64bit":
+    if struct == "64bit":
         bin_name = "raspad-launcher-64"
-    elif "struct == 32bit":
+    elif struct == "32bit":
         bin_name = "raspad-launcher-32"
     else:
         fail_string = colored("Fail", "red")
@@ -151,7 +152,8 @@ def install():
 
 def cleanup():
     os.chdir(install_path)
-    os.remove("raspad-auto-rotator")
+    if os.path.isdir("raspad-auto-rotator"):
+        shutil.rmtree("raspad-auto-rotator")
 
 def run_command(cmd=""):
     import subprocess
