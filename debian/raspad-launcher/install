@@ -6,6 +6,8 @@ import grp
 import platform
 import shutil
 
+DEBIAN_NAMES = ["N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "squeeze", "wheezy", "jessie", "stretch", "buster", "bullseye", "bookworm"]
+
 username = os.getlogin()
 gid = pwd.getpwnam(username).pw_gid
 group_name = grp.getgrgid(gid)[0]
@@ -68,15 +70,17 @@ def install():
         quit()
     print("RasPad Launcher installation starts")
 
-    if struct == "64bit":
-        bin_name = "raspad-launcher-64"
-    elif struct == "32bit":
-        bin_name = "raspad-launcher-32"
-    else:
-        fail_string = colored("Fail", "red")
-        print(f"[{fail_string}] Unknown system architecture: {struct}")
+    debian_version = get_debian_version()
+    if debian_version < 10:
+        print("RasPad Launcher is for Debian 10 or higher")
         sys.exit(1)
-
+    elif debian_version > 11:
+        print("RasPad Launcher has not been compatible for Debian 11 or higher, please contact service@sunfounder.com for more information, or visit https://github.com/raspad-tablet/raspad-launcher for source code.")
+        sys.exit(1)
+    else:
+        debian_name = DEBIAN_NAMES[debian_version]
+    bin_name = f"raspad-launcher-{debian_name}-{struct}"
+    print(f"Using binary: {bin_name}")
 
     if "--no-dep" not in options:
         do(msg="Update apt",
@@ -192,6 +196,12 @@ def do(msg="", cmd=""):
 def check_sudo():
     if os.geteuid() != 0:
         sys.exit("You need root permissions to do this!")
+
+def get_debian_version():
+    with open("/etc/issue", "r") as f:
+        issue = f.read()
+        datas = issue.split(" ")
+        return int(datas[2])
 
 if __name__ == "__main__":
     check_sudo()
