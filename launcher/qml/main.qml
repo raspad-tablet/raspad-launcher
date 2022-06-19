@@ -70,6 +70,8 @@ ApplicationWindow {
 
     property string errorNetwork: qsTr("Network Error")
 
+    property var iconDirs: generateIconSearchDirs()
+
     // Panel
     Rectangle {
         id: panel
@@ -640,42 +642,45 @@ ApplicationWindow {
         // log("categoriedAppList")
         // logObj(categoriedAppList)
     }
+
+    function generateIconSearchDirs() {
+        var iconDirs = []
+        var iconBaseDirs = ["/usr/share/icons"]
+
+        for (var i = 0; i < iconBaseDirs.length; i++) {
+            var themes = ["PiXflat", "hicolor", "gnome"];
+
+            for (var j = 0; j < themes.length; j++) {
+                var themeDir = iconBaseDirs[i] + "/" + themes[j];
+                if (!fileinfo.isDir(themeDir)) {
+                    continue;
+                }
+                var sections = ["apps", "devices", "places" , "categories"];
+
+                for (var k = 0; k < sections.length; k++) {
+                    var resolutions = ["256x256", "128x128", "64x64",
+                                       "48x48", "32x32", "scalable"];
+
+                    for (var l = 0; l < resolutions.length; l++) {
+                        var iconDir = themeDir + "/" + resolutions[l]
+                                           + "/" + sections[k] + "/";
+                        if (fileinfo.isDir(iconDir)) {
+                            iconDirs.push(iconDir);
+                        }
+                    }
+                }
+            }
+        }
+        iconDirs.push("/usr/share/pixmaps/");
+        // log("iconDirs (" + iconDirs.length + ")")
+        // logList(iconDirs);
+
+        return iconDirs;
+    }
+
     function getIconPath(icon) {
-        var testList = [
-            "/usr/share/icons/PiXflat/256x256/apps/",
-            "/usr/share/icons/PiXflat/128x128/apps/",
-            "/usr/share/icons/PiXflat/64x64/apps/",
-            "/usr/share/icons/PiXflat/48x48/apps/",
-            "/usr/share/icons/PiXflat/256x256/devices/",
-            "/usr/share/icons/PiXflat/128x128/devices/",
-            "/usr/share/icons/PiXflat/64x64/devices/",
-            "/usr/share/icons/PiXflat/48x48/devices/",
-            "/usr/share/icons/PiXflat/256x256/places/",
-            "/usr/share/icons/PiXflat/128x128/places/",
-            "/usr/share/icons/PiXflat/64x64/places/",
-            "/usr/share/icons/PiXflat/48x48/places/",
-            "/usr/share/icons/PiXflat/256x256/categories/",
-            "/usr/share/icons/PiXflat/128x128/categories/",
-            "/usr/share/icons/PiXflat/64x64/categories/",
-            "/usr/share/icons/PiXflat/48x48/categories/",
-            "/usr/share/icons/hicolor/256x256/apps/",
-            "/usr/share/icons/hicolor/128x128/apps/",
-            "/usr/share/icons/hicolor/64x64/apps/",
-            "/usr/share/icons/hicolor/48x48/apps/",
-            "/usr/share/icons/hicolor/32x32/apps/",
-            "/usr/share/icons/hicolor/scalable/apps/",
-            "/usr/share/icons/gnome/256x256/apps/",
-            "/usr/share/icons/gnome/128x128/apps/",
-            "/usr/share/icons/gnome/64x64/apps/",
-            "/usr/share/icons/gnome/48x48/apps/",
-            "/usr/share/icons/gnome/256x256/devices/",
-            "/usr/share/icons/gnome/128x128/devices/",
-            "/usr/share/icons/gnome/64x64/devices/",
-            "/usr/share/icons/gnome/48x48/devices/",
-            "/usr/share/pixmaps/"
-        ];
-        for (var i = 0; i < testList.length; i++) {
-            var path_pre = testList[i] + icon
+        for (var i = 0; i < iconDirs.length; i++) {
+            var path_pre = iconDirs[i] + icon
             var path = path_pre
             if (icon.indexOf(".png") == -1 && icon.indexOf(".svg") == -1) {
                 path = path_pre + ".png"
