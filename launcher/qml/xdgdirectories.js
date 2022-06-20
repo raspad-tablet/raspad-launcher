@@ -21,6 +21,15 @@
         return dataHomeDir;
     }
 
+    function getXDGConfigHomeDir() {
+        var configHomeDir = environment.getenv("XDG_CONFIG_HOME");
+        if (configHomeDir === "") {
+            // Use default according to "XDG Base Directory Specification".
+            configHomeDir = getHomeDir() + "/.config";
+        }
+        return configHomeDir;
+    }
+
     function getXDGDataDirs() {
         var dataDirs = environment.getenv("XDG_DATA_DIRS");
         if (dataDirs === "") {

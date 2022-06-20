@@ -763,7 +763,7 @@ ApplicationWindow {
     function readFile(file, raw) {
         var base = ""
         if (raw !== true) {
-            base = "file:///home/pi/.config/raspad/"
+            base = "file://" + XDGDirs.getXDGConfigHomeDir() + "/raspad/"
         }
         var read = new XMLHttpRequest()
         read.open("GET", base + file, false)
