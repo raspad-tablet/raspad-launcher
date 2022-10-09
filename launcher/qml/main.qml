@@ -8,6 +8,7 @@ import QtQuick.Dialogs 1.1
 import "execvalueparser.js" as Parser
 import FileInfo 1.0
 import ProcessEnvironment 1.0
+import "xdgdirectories.js" as XDGDirs
 
 ApplicationWindow {
     id: window
@@ -25,6 +26,12 @@ ApplicationWindow {
         if (!active) {
             Qt.quit()
         }
+    }
+
+    Component.onCompleted: {
+        createFolderListModels();
+        iconDirs = generateIconSearchDirs();
+        loadApplicationTimer.start();
     }
 
     property string settime
@@ -64,11 +71,14 @@ ApplicationWindow {
         "Help": ["Help"],
         "Preferences": ["Settings"]
     }
-    property var blacklist: ["squeak.desktop", "wolfram-language.desktop"]
-    property var whitelist: ["arandr.desktop", "rp-bookshelf.desktop"]
+    property var blacklist: ["wolfram-language.desktop"]
+    property var whitelist: []
     property var currentCategory: "Home"
 
     property string errorNetwork: qsTr("Network Error")
+
+    property var iconDirs: []
+    property var appFolderListModels: []
 
     // Panel
     Rectangle {
@@ -355,9 +365,9 @@ ApplicationWindow {
                                 }
                                 result = _icon
                             } else {
-                                result = "file://" + appIcon
+                                result = appIcon
                             }
-                            return result
+                            return "file://" + result
                         }
                         anchors {
                             horizontalCenter: parent.horizontalCenter
@@ -438,31 +448,13 @@ ApplicationWindow {
         modality: Qt.ApplicationModal
     }
 
-    // 系统安装APP的文件获取模型
-    FolderListModel {
-        id: systemApplicationsFolderList
-        folder: "file:///usr/share/applications"
-        nameFilters: ["*.desktop"]
-        Component.onCompleted: {
-            loadApplicationTimer.start();
-        }
-    }
-    // 用户安装APP的文件获取模型
-    FolderListModel {
-        id: userApplicationsFolderList
-        folder: "file:///home/pi/.local/share/applications"
-        nameFilters: ["*.desktop"]
-        Component.onCompleted: {
-            loadApplicationTimer.start();
-        }
-    }
-    // 用户安装APP的文件获取模型
-    FolderListModel {
-        id: raspiUiOverridesApplicationsFolderList
-        folder: "file:///usr/share/raspi-ui-overrides/applications"
-        nameFilters: ["*.desktop"]
-        Component.onCompleted: {
-            loadApplicationTimer.start();
+    Component {
+        id: folderListModelComponent
+
+        // 系统安装APP的文件获取模型
+        // 用户安装APP的文件获取模型
+        FolderListModel {
+             nameFilters: ["*.desktop"]
         }
     }
 
@@ -640,63 +632,54 @@ ApplicationWindow {
         // log("categoriedAppList")
         // logObj(categoriedAppList)
     }
-    function isFileExist(path) {
-        var xhr = new XMLHttpRequest()
-        xhr.open("GET", path, false)
-        xhr.send()
-        if (xhr.readyState !== 4) {
-            return false
+
+    function generateIconSearchDirs() {
+        var iconDirs = []
+        var iconBaseDirs = XDGDirs.getXDGDataDirsSubdirs("icons");
+
+        for (var i = 0; i < iconBaseDirs.length; i++) {
+            var themes = ["PiXflat", "hicolor", "gnome"];
+
+            for (var j = 0; j < themes.length; j++) {
+                var themeDir = iconBaseDirs[i] + "/" + themes[j];
+                if (!fileinfo.isDir(themeDir)) {
+                    continue;
+                }
+                var sections = ["apps", "devices", "places" , "categories", "status"];
+
+                for (var k = 0; k < sections.length; k++) {
+                    var resolutions = ["256x256", "128x128", "64x64",
+                                       "48x48", "32x32", "scalable"];
+
+                    for (var l = 0; l < resolutions.length; l++) {
+                        var iconDir = themeDir + "/" + resolutions[l]
+                                           + "/" + sections[k] + "/";
+                        if (fileinfo.isDir(iconDir)) {
+                            iconDirs.push(iconDir);
+                        }
+                    }
+                }
+            }
         }
-        if (xhr.status !== 200) {
-            return false
-        }
-        return true
+        iconDirs.push("/usr/share/pixmaps/");
+        // log("iconDirs (" + iconDirs.length + ")")
+        // logList(iconDirs);
+
+        return iconDirs;
     }
+
     function getIconPath(icon) {
-        var testList = [
-            "/usr/share/icons/PiXflat/256x256/apps/",
-            "/usr/share/icons/PiXflat/128x128/apps/",
-            "/usr/share/icons/PiXflat/64x64/apps/",
-            "/usr/share/icons/PiXflat/48x48/apps/",
-            "/usr/share/icons/PiXflat/256x256/devices/",
-            "/usr/share/icons/PiXflat/128x128/devices/",
-            "/usr/share/icons/PiXflat/64x64/devices/",
-            "/usr/share/icons/PiXflat/48x48/devices/",
-            "/usr/share/icons/PiXflat/256x256/places/",
-            "/usr/share/icons/PiXflat/128x128/places/",
-            "/usr/share/icons/PiXflat/64x64/places/",
-            "/usr/share/icons/PiXflat/48x48/places/",
-            "/usr/share/icons/PiXflat/256x256/categories/",
-            "/usr/share/icons/PiXflat/128x128/categories/",
-            "/usr/share/icons/PiXflat/64x64/categories/",
-            "/usr/share/icons/PiXflat/48x48/categories/",
-            "/usr/share/icons/hicolor/256x256/apps/",
-            "/usr/share/icons/hicolor/128x128/apps/",
-            "/usr/share/icons/hicolor/64x64/apps/",
-            "/usr/share/icons/hicolor/48x48/apps/",
-            "/usr/share/icons/hicolor/32x32/apps/",
-            "/usr/share/icons/hicolor/scalable/apps/",
-            "/usr/share/icons/gnome/256x256/apps/",
-            "/usr/share/icons/gnome/128x128/apps/",
-            "/usr/share/icons/gnome/64x64/apps/",
-            "/usr/share/icons/gnome/48x48/apps/",
-            "/usr/share/icons/gnome/256x256/devices/",
-            "/usr/share/icons/gnome/128x128/devices/",
-            "/usr/share/icons/gnome/64x64/devices/",
-            "/usr/share/icons/gnome/48x48/devices/",
-            "/usr/share/pixmaps/"
-        ];
-        for (var i = 0; i < testList.length; i++) {
-            var path_pre = "file://" + testList[i] + icon
+        for (var i = 0; i < iconDirs.length; i++) {
+            var path_pre = iconDirs[i] + icon
             var path = path_pre
             if (icon.indexOf(".png") == -1 && icon.indexOf(".svg") == -1) {
                 path = path_pre + ".png"
-                if (isFileExist(path)) {
+                if (fileinfo.isFile(path)) {
                     return path
                 }
                 path = path_pre + ".svg"
             }
-            if (isFileExist(path)) {
+            if (fileinfo.isFile(path)) {
                 return path
             }
         }
@@ -780,7 +763,7 @@ ApplicationWindow {
     function readFile(file, raw) {
         var base = ""
         if (raw !== true) {
-            base = "file:///home/pi/.config/raspad/"
+            base = "file://" + XDGDirs.getXDGConfigHomeDir() + "/raspad/"
         }
         var read = new XMLHttpRequest()
         read.open("GET", base + file, false)
@@ -792,7 +775,27 @@ ApplicationWindow {
         return result
     }
 
-    // To load icons from folder list
+    function createFolderListModels() {
+        var appFolders = XDGDirs.getXDGDataDirsSubdirs("applications");
+        // log("appFolders");
+        // logList(appFolders);
+
+        appFolderListModels = [];
+        for (var i = 0; i < appFolders.length; i++) {
+             var appFolderListModel =
+                                folderListModelComponent.createObject(window,
+                                          {folder: 'file://' + appFolders[i]})
+             if (appFolderListModel !== null) {
+                 appFolderListModels.push(appFolderListModel);
+             }
+             else {
+                 console.log('Could not create FolderListModel for folder',
+                             appFolders[i]);
+             }
+        }
+    }
+
+    // Load *.desktop files from folder lists.
     Timer {
         id: loadApplicationTimer
         interval: 1
@@ -801,26 +804,18 @@ ApplicationWindow {
             if (isLoadApplicationTriggered) {
                 return;
             }
-            // if userApplicationsFolderList is not Ready, Try again
-            if (userApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
-            }
-            // if raspiUiOverridesApplicationsFolderList is not Ready, Try again
-            if (raspiUiOverridesApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
-            }
-            // if systemApplicationsFolderList is not Ready, Try again
-            if (systemApplicationsFolderList.status !== FolderListModel.Ready) {
-                loadApplicationTimer.start();
-                return;
+            for (var i = 0; i < appFolderListModels.length; i++) {
+                // if any FolderListModel is not Ready, Try again
+                if (appFolderListModels[i].status !== FolderListModel.Ready) {
+                    loadApplicationTimer.start();
+                    return;
+                }
             }
             isLoadApplicationTriggered = true;
             appData = {};
-            loadFromFolderListModel(userApplicationsFolderList);
-            loadFromFolderListModel(raspiUiOverridesApplicationsFolderList);
-            loadFromFolderListModel(systemApplicationsFolderList);
+            for (var i = 0; i < appFolderListModels.length; i++) {
+                loadFromFolderListModel(appFolderListModels[i]);
+            }
             reloadAppList();
             isLoadApplicationTriggered = false;
         }

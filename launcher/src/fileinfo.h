@@ -1,6 +1,6 @@
 #include <QFileInfo>
 
-// class that is used as qml type with one (static) method.
+// class that is used as qml type with five (static) methods.
 
 class FileInfo : public QObject {
     Q_OBJECT
@@ -41,5 +41,29 @@ public:
             }
         }
         return false;
+    }
+
+    // Checks, if path exists and is a file, not a directory.
+    Q_INVOKABLE bool isFile(const QString &path) {
+        QFileInfo finfo(path);
+        return finfo.isFile();
+    }
+
+    // Checks, if path exists and is a directory.
+    Q_INVOKABLE bool isDir(const QString &path) {
+        QFileInfo finfo(path);
+        return finfo.isDir();
+    }
+
+    // Checks, if path is absolute.
+    Q_INVOKABLE bool isAbsolute(const QString &path) {
+        QFileInfo finfo(path);
+        return finfo.isAbsolute();
+    }
+
+    // Checks, if path is relative.
+    Q_INVOKABLE bool isRelative(const QString &path) {
+        QFileInfo finfo(path);
+        return finfo.isRelative();
     }
 };
