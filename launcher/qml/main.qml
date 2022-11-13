@@ -17,8 +17,6 @@ ApplicationWindow {
     width: Screen.width
     height: Screen.height
     color: 'white'
-    visible: true
-    visibility: "FullScreen"
     flags: Qt.FramelessWindowHint
     title: 'RasPad Launcher'
 
@@ -817,6 +815,7 @@ ApplicationWindow {
                 loadFromFolderListModel(appFolderListModels[i]);
             }
             reloadAppList();
+            visibility = "FullScreen";
             isLoadApplicationTriggered = false;
         }
     }
